@@ -1,0 +1,82 @@
+.stencil-app {
+  display: flex;
+  width: 100%;
+  height: 81vh; /* 设置高度为视口高度 */
+  padding: 0;
+  font-family: sans-serif;
+  overflow: hidden; /* 隐藏超出视口的滚动条 */
+}
+
+.app-stencil {
+  position: relative;
+  width: 200px;
+  border: 1px solid #f0f0f0;
+  height: 100%; /* 让侧边栏高度铺满父元素 */
+}
+
+.app-content {
+  flex: 1;
+  height: 100%; /* 让内容区域高度铺满父元素 */
+  margin-right: 8px;
+  margin-left: 8px;
+  border-radius: 5px;
+  box-shadow: 0 12px 5px -10px rgb(0 0 0 / 10%), 0 0 4px 0 rgb(0 0 0 / 10%);
+  overflow-y: auto; /* 尝试让 app-content 内部滚动 */
+}
+
+.x6-context-menu {
+  position: fixed;
+  z-index: 9999;
+  min-width: 120px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  padding: 6px 0;
+  animation: fadeIn 0.2s;
+}
+
+.x6-context-menu-item {
+  padding: 8px 18px;
+  cursor: pointer;
+  font-size: 15px;
+  color: #333;
+  transition: background 0.2s;
+}
+
+.x6-context-menu-item:hover {
+  background: #f5f5f5;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ant-drawer-body {
+  height: 100%;
+  padding: 0;
+}
+.ant-drawer-body .x6-widget-stencil {
+  height: 100% !important;
+  min-height: 0 !important;
+  background: #fff !important;
+  border: none !important;
+  box-shadow: none !important;
+  display: flex;
+  flex-direction: column;
+}
+.x6-widget-stencil-group-title {
+  font-size: 15px;
+  font-weight: 600;
+  background: #f7f9fb;
+  padding: 8px 12px;
+  color: #222;
+  border-bottom: 1px solid #f0f0f0;
+}

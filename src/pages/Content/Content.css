@@ -1,0 +1,44 @@
+.content {
+  background: #f0f2f5;
+  min-height: calc(100vh - 64px); /* Adjust for header height */
+}
+
+.content .ant-layout {
+  padding: 12px;
+}
+
+.content .ant-layout-sider {
+  background: #fff;
+  border-radius: 24px;
+  margin: 16px 0 16px 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  transition: box-shadow 0.3s, transform 0.3s;
+  overflow: hidden;
+  max-height: calc(100vh - 120px); /* Adjust for header height */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.content .ant-layout-sider:hover {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  transform: translateY(-4px) scale(1.03);
+}
+
+.content .ant-layout-content {
+  background: #fff;
+  border-radius: 24px;
+  margin: 16px 0 16px 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  transition: box-shadow 0.3s, transform 0.3s;
+  overflow: hidden;
+  max-height: calc(100vh - 120px); /* Adjust for header height */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.content .ant-layout-content:hover {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  transform: translateY(-4px) scale(1.03);
+}

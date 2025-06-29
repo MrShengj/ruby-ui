@@ -1,0 +1,277 @@
+.ant-card {
+  border-radius: 16px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1.5px 4px rgba(0, 0, 0, 0.06);
+  background: #fff !important;
+  border: none !important;
+  transition: box-shadow 0.3s, transform 0.3s;
+  overflow: hidden;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 0 !important;
+}
+
+.ant-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14), 0 3px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px) scale(1.02);
+  background: #f6fbff !important;
+}
+
+.card-row {
+  display: flex;
+  align-items: center;
+  min-height: 90px;
+}
+
+.card-avatar-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60px;
+  min-width: 54px;
+  max-width: 54px;
+}
+
+.large-avatar {
+  width: 54px !important;
+  height: 54px !important;
+  min-width: 54px !important;
+  min-height: 54px !important;
+  object-fit: contain;
+  background: #f5f5f5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+}
+
+.card-content-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding-left: 8px;
+}
+
+.ant-card-meta {
+  align-items: center !important;
+}
+
+.ant-card-meta-avatar {
+  margin-right: 16px !important;
+  padding-inline-end: 0;
+}
+
+.ant-card-meta-avatar {
+  border-radius: 8px;
+  width: 36px !important;
+  height: 36px !important;
+  margin-right: 8px;
+}
+
+.ant-card-meta-title {
+  font-weight: 600;
+  font-family: 微软雅黑, sans-serif;
+  font-size: 18px;
+  color: #222;
+  text-align: left;
+  padding-left: 0;
+  padding-top: 0;
+  margin-bottom: 4px;
+}
+
+.ant-card-meta-description {
+  font-size: 13px;
+  color: #888;
+  text-align: left;
+  word-break: break-all;
+}
+
+.ant-card-switch {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+@media (max-width: 600px) {
+  .ant-card {
+    width: 100% !important;
+    min-width: 0;
+  }
+}
+
+.kg {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 30px;
+}
+
+.edit {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 20px;
+}
+
+.edit-btn {
+  margin-top: 8px;
+  margin-right: 0;
+}
+
+.custom-switch .ant-switch {
+  background: #1677ff;
+  border-radius: 20px;
+  min-width: 44px;
+  height: 26px;
+  box-shadow: 0 2px 8px rgba(22, 119, 255, 0.08);
+  transition: background 0.2s;
+}
+
+.custom-switch .ant-switch-checked {
+  background: #52c41a;
+}
+
+.custom-switch .ant-switch-handle {
+  width: 22px;
+  height: 22px;
+  top: 2px;
+  left: 2px;
+}
+
+.operate-card-wrapper {
+  position: relative;
+}
+
+.operate-card {
+  cursor: pointer;
+  overflow: hidden;
+  background: #ffffff;
+  position: relative;
+}
+
+.operate-card.active {
+  background: #ffffff;
+  border-color: #1890ff !important;
+}
+
+.operate-card:hover {
+  border-color: #1890ff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(24, 144, 255, 0.15);
+}
+
+/* 状态指示器 */
+.status-indicator {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.status-dot.active {
+  background-color: #52c41a;
+  box-shadow: 0 0 0 3px rgba(82, 196, 26, 0.2);
+}
+
+.status-dot.inactive {
+  background-color: #d9d9d9;
+}
+
+/* 右上角开关 */
+.switch-container {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  z-index: 2;
+}
+
+/* 主要内容区域 */
+.card-main-content {
+  padding-top: 8px;
+  transition: all 0.3s ease;
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.avatar-section {
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.content-section {
+  flex: 1;
+  min-width: 0;
+}
+
+.title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.operate-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+  line-height: 1.4;
+  word-break: break-word;
+  flex: 1;
+  transition: all 0.3s ease;
+}
+
+.operate-card.active .operate-title {
+  color: #1890ff;
+  font-weight: 700;
+}
+
+/* 编辑按钮 */
+.edit-button {
+  opacity: 0;
+  transform: translateX(10px);
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  margin-top: 8px;
+}
+
+.edit-button.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.action-btn {
+  color: #666;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover.edit-btn {
+  color: #1890ff;
+  background-color: #f0f9ff;
+  transform: scale(1.1);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .operate-card-wrapper {
+    width: 100%;
+  }
+
+  .operate-card {
+    width: 100% !important;
+  }
+}

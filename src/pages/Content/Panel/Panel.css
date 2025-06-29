@@ -1,0 +1,61 @@
+.panel {
+  padding: 12px;
+}
+
+.remark {
+  font-size: 16px;
+  color: #888;
+  font-weight: 500;
+  display: flex;
+  flex-direction: column; /* Display the content in a column */
+  justify-content: center; /* Vertically center the content */
+  align-items: center; /* Horizontally center the content */
+  line-height: normal; /* Reset line height */
+  gap: 2px;
+}
+
+.circle-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%; /* 可根据实际需要调整高度 */
+}
+
+.circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: red;
+  filter: blur(4px);
+}
+
+.active {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: green;
+  filter: blur(4px);
+}
+
+.gradient-divider {
+  border-top: 0;
+  height: 8px;
+  margin: 16px 0;
+  background: linear-gradient(90deg, #ff4069 0%, #ffb86c 50%, #38cfff 100%);
+  border-radius: 8px;
+  opacity: 1;
+  background-size: 200% 200%;
+  animation: gradient-move 4s ease-in-out infinite;
+}
+
+@keyframes gradient-move {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}

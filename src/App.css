@@ -1,0 +1,90 @@
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* 禁止全局滚动条 */
+}
+
+.ant-layout {
+  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden; /* 禁止 layout 滚动条 */
+}
+
+.logo.vite:hover {
+  filter: drop-shadow(0 0 2em #747bff);
+}
+
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafb);
+}
+.contentStyle {
+  margin-top: 64px;
+  height: calc(100vh - 64px);
+  background: #f7f9fb;
+  padding: 0;
+  padding-top: 5px;
+  scrollbar-width: none; /* 禁止滚动条 */
+  overflow: hidden;      /* 禁止滚动条 */
+}
+
+
+/* Chrome/Edge/Safari */
+.contentStyle::-webkit-scrollbar {
+  width: 6px;
+  background: transparent;
+}
+.contentStyle::-webkit-scrollbar-thumb {
+  background: #e0e0e0;
+  border-radius: 4px;
+}
+.contentStyle::-webkit-scrollbar-thumb:hover {
+  background: #cccccc;
+}
+.contentStyle::-webkit-scrollbar-track {
+  background: transparent;
+}
+.headerStyle {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  height: 64px;
+  text-align: center;
+  color: #fff;
+  padding: 0 32px;
+  line-height: 64px;
+  background: linear-gradient(90deg, #9b111e, #e0115f, #ff4069, #9b111e);
+  background-size: 200% 200%;
+  animation: ruby-gradient 6s ease-in-out infinite;
+  -webkit-app-region: drag;
+  box-shadow: 0 4px 24px 0 rgba(155, 17, 30, 0.15);
+  display: flex;
+  align-items: center;
+  backdrop-filter: blur(6px) saturate(120%);
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.12);
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+@keyframes ruby-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.ant-layout-header {
+  padding: 0 20px;
+}
+.ant-card-body {
+  padding: 12px !important;
+}

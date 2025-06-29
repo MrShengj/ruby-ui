@@ -1,0 +1,95 @@
+[
+  {
+    "x": 100,
+    "y": 100,
+    "id": "2a722205-d371-4b0b-9a62-ae6b25ba2f84",
+    "data": { "elements_key": "侧下键", "elements_code": 4 },
+    "attrs": {
+      "body": {
+        "rx": 8,
+        "ry": 8,
+        "fill": "#fffbe6",
+        "stroke": "#003a8c",
+        "refWidth": "100%",
+        "refHeight": "100%"
+      },
+      "rect": { "fill": "#ffffff", "stroke": "#333333", "strokeWidth": 2 },
+      "text": {
+        "fill": "#000000",
+        "refX": 0.5,
+        "refY": 0.5,
+        "fontSize": 14,
+        "fontFamily": "Arial, helvetica, sans-serif",
+        "textAnchor": "middle",
+        "textVerticalAnchor": "middle"
+      },
+      "label": { "fill": "#003a8c", "text": "侧下键", "fontSize": 14 }
+    },
+    "label": "侧下键",
+    "shape": "rect",
+    "width": 60,
+    "height": 36
+  },
+  {
+    "x": 100,
+    "y": 172,
+    "id": "fc5a06f5-42df-4e36-92ef-00f5a996d8c0",
+    "data": { "elements_key": "2", "elements_code": 50 },
+    "attrs": {
+      "body": {
+        "rx": 8,
+        "ry": 8,
+        "fill": "#fffbe6",
+        "stroke": "#1890ff",
+        "refWidth": "100%",
+        "refHeight": "100%"
+      },
+      "rect": { "fill": "#ffffff", "stroke": "#333333", "strokeWidth": 2 },
+      "text": {
+        "fill": "#000000",
+        "refX": 0.5,
+        "refY": 0.5,
+        "fontSize": 14,
+        "fontFamily": "Arial, helvetica, sans-serif",
+        "textAnchor": "middle",
+        "textVerticalAnchor": "middle"
+      },
+      "label": { "fill": "#1890ff", "text": "2", "fontSize": 14 }
+    },
+    "label": "2",
+    "shape": "rect",
+    "width": 60,
+    "height": 36
+  },
+  {
+    "x": 100,
+    "y": 238,
+    "id": "df38e973-d925-406d-8adc-8bf3f7c29b63",
+    "data": { "elements_key": "4", "elements_code": 52 },
+    "attrs": {
+      "body": {
+        "rx": 8,
+        "ry": 8,
+        "fill": "#fffbe6",
+        "stroke": "#1890ff",
+        "refWidth": "100%",
+        "refHeight": "100%"
+      },
+      "rect": { "fill": "#ffffff", "stroke": "#333333", "strokeWidth": 2 },
+      "text": {
+        "fill": "#000000",
+        "refX": 0.5,
+        "refY": 0.5,
+        "fontSize": 14,
+        "fontFamily": "Arial, helvetica, sans-serif",
+        "textAnchor": "middle",
+        "textVerticalAnchor": "middle"
+      },
+      "label": { "fill": "#1890ff", "text": "4", "fontSize": 14 }
+    },
+    "label": "4",
+    "shape": "rect",
+    "width": 60,
+    "height": 36
+  }
+]

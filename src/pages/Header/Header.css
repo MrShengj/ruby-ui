@@ -1,0 +1,86 @@
+.headerContainer {
+  display: flex;
+  align-items: center;
+  height: 64px;
+  width: 100vw;
+  -webkit-app-region: drag;
+}
+
+.avatar {
+  /* 可选：如果你希望 Avatar 保持在容器的边缘，添加一些 margin */
+  margin-right: 20px; /* 可选的间距 */
+  width: 40px; /* 调整宽度，放大 Avatar */
+  height: 40px; /* 调整高度，放大 Avatar */
+}
+
+.p {
+  margin-right: 10px; /* 可选的间距 */
+  font-family: "隶书";
+  font-size: "16px";
+  color: "blue";
+}
+
+.uidContainer {
+  margin-right: auto; /* This ensures the UID is aligned to the right */
+}
+
+.uid {
+  font-size: 16px;
+  font-weight: bold;
+  background: linear-gradient(
+    270deg,
+    #ff0000,
+    #00ff00,
+    #0000ff
+  ); /* Initial gradient colors */
+  background-size: 200% 200%; /* To make the gradient animate smoothly */
+  background-clip: text;
+  -webkit-background-clip: text; /* For Safari */
+  color: transparent;
+  animation: gradientAnimation 5s ease infinite;
+  -webkit-app-region: drag;
+  opacity: 0; /* 初始隐藏 */
+  visibility: hidden; /* 初始隐藏 */
+  transition: opacity 0.3s ease, visibility 0.3s ease; /* 添加过渡效果 */
+}
+
+.uidContainer:hover .uid {
+  opacity: 1; /* 悬停时显示 */
+  visibility: visible; /* 悬停时显示 */
+}
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+}
+
+.windowButton {
+  width: 24px; /* 按钮宽度 */
+  height: 24px; /* 按钮高度 */
+  margin-left: 10px;
+  display: flex; /* 使用 Flexbox */
+  align-items: center; /* 垂直居中 */
+  justify-content: center; /* 水平居中 */
+  font-size: 12px; /* 调整字体大小 */
+  background: none;
+  border: none;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+}
+
+.windowButton:hover {
+  background-color: transparent !important; /* 鼠标悬浮时去掉背景 */
+  transform: scale(1.4); /* 放大 10% */
+}

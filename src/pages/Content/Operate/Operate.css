@@ -1,0 +1,9 @@
+.operate {
+  padding: 36px 48px;
+  background-color: #f0f2f5;
+}
+
+.operate-card-wrapper {
+  position: relative;
+  margin-bottom: 16px; /* 添加底部间距 */
+}
