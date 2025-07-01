@@ -593,6 +593,15 @@ const OperateX6 = forwardRef<any, OperateX6Props>(({
             panning: true,
             mousewheel: true,
             connecting: {
+                // 添加智能路由
+                router: 'manhattan',
+                // 添加圆角连接器
+                connector: {
+                    name: 'rounded',
+                    args: {
+                        radius: 8,
+                    },
+                },
                 sourceAnchor: 'center',
                 targetAnchor: 'center',
                 allowBlank: false,
@@ -602,6 +611,39 @@ const OperateX6 = forwardRef<any, OperateX6Props>(({
                 allowNode: false,
                 allowEdge: false,
                 allowPort: true,
+                // 自定义连线创建
+                createEdge() {
+                    return new Shape.Edge({
+                        attrs: {
+                            line: {
+                                stroke: '#A2B1C3',
+                                strokeWidth: 2,
+                                targetMarker: {
+                                    name: 'block',
+                                    width: 12,
+                                    height: 8,
+                                },
+                            },
+                        },
+                        zIndex: 0,
+                    })
+                },
+                // 验证连接
+                validateConnection({ targetMagnet }) {
+                    return !!targetMagnet
+                },
+            },
+            // 添加高亮效果
+            highlighting: {
+                magnetAdsorbed: {
+                    name: 'stroke',
+                    args: {
+                        attrs: {
+                            fill: '#5F95FF',
+                            stroke: '#5F95FF',
+                        },
+                    },
+                },
             },
         });
 

@@ -1,10 +1,13 @@
-import { Drawer, message, Modal, Input, Radio, Space } from "antd";
+import { Drawer, message, Modal, Input, Radio, Space, Button, Divider, Typography, Card, Avatar } from "antd";
+import { SaveOutlined, DeleteOutlined, EditOutlined, PlusOutlined, CloseOutlined } from '@ant-design/icons';
 import React, { forwardRef, useEffect } from "react";
 import OperateX6 from "../../../components/OperateX6";
 import "./DoOperate.css";
 import { getElements, getSkills, getUserRGB } from "../../../api/element";
 import { createOperate, updateOperate, deleteOperate } from "../../../api/operate";
 import { Operate } from "../../../model/operate";
+
+const { Title, Text } = Typography;
 
 interface AddOperateProps {
     open?: boolean;
@@ -13,10 +16,11 @@ interface AddOperateProps {
     operateName?: string;
     operateId?: number;
     isEdit?: boolean;
+    operateIcon?: string; // 添加操作图标属性
     onClose?: () => void;
 }
 
-const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initialEdges, operateName: initialOperateName, operateId, isEdit }: AddOperateProps, ref) => {
+const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initialEdges, operateName: initialOperateName, operateId, isEdit, operateIcon }: AddOperateProps, ref) => {
 
     const [elements, setElements] = React.useState<any[]>([]);
     const [skills, setSkills] = React.useState<any[]>([]);
@@ -28,20 +32,20 @@ const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initi
     const operateX6Ref = React.useRef<any>(null);
     const [isModalOpen, setIsModalOpen] = React.useState(false);
     const [operateName, setOperateName] = React.useState("");
-    const [selectedIcon, setSelectedIcon] = React.useState("/new.svg"); // 默认图标
+    const [selectedIcon, setSelectedIcon] = React.useState("/new.svg");
     const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
 
     // 预设图标列表
     const iconOptions = [
-        { value: "/new.svg", label: "默认" },
-        { value: "/icon/js.jpg", label: "剑士" },
-        { value: "/icon/ls.jpg", label: "力士" },
-        { value: "/icon/lj.jpg", label: "灵剑" },
-        { value: "/icon/qg.jpg", label: "气功" },
-        { value: "/icon/qs.jpg", label: "拳师" },
-        { value: "/icon/zh.jpg", label: "召唤" },
-        { value: "/icon/ck.jpg", label: "刺客" },
-        { value: "/icon/zs.jpg", label: "咒术" },
+        { value: "/new.svg", label: "默认", color: "#1890ff" },
+        { value: "/icon/js.jpg", label: "剑士", color: "#722ed1" },
+        { value: "/icon/ls.jpg", label: "力士", color: "#fa541c" },
+        { value: "/icon/lj.jpg", label: "灵剑", color: "#13c2c2" },
+        { value: "/icon/qg.jpg", label: "气功", color: "#52c41a" },
+        { value: "/icon/qs.jpg", label: "拳师", color: "#faad14" },
+        { value: "/icon/zh.jpg", label: "召唤", color: "#eb2f96" },
+        { value: "/icon/ck.jpg", label: "刺客", color: "#2f54eb" },
+        { value: "/icon/zs.jpg", label: "咒术", color: "#f5222d" },
     ];
 
     const getAllElements = async () => {
@@ -72,13 +76,13 @@ const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initi
         }
         await getUserRGB({ user_id: Number(userId) }).then((res) => {
             if (res.code === 200) {
-                console.log("获取取色数据成功:", res.data);
+                // console.log("获取取色数据成功:", res.data);
                 setColors(res.data);
             } else {
                 messageApi.error("获取取色数据失败：" + res.msg);
             }
         }).catch((error) => {
-            console.error("获取取色数据失败:", error);
+            // console.error("获取取色数据失败:", error);
             messageApi.error("获取取色数据失败");
         });
     }
@@ -118,9 +122,20 @@ const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initi
             setNodes(processedNodes);
             setEdges(processedEdges);
             setOperateName(initialOperateName);
-        }
 
-    }, [isEdit, initialNodes, initialEdges, initialOperateName, open]);
+            // 设置图标，如果有传入的图标则使用，否则使用默认图标
+            if (operateIcon) {
+                console.log("使用传入的图标:", operateIcon);
+                setSelectedIcon(operateIcon);
+            }
+        } else {
+            // 新建模式，重置所有状态
+            setNodes([]);
+            setEdges([]);
+            setOperateName("");
+            setSelectedIcon("/new.svg"); // 新建时使用默认图标
+        }
+    }, [isEdit, initialNodes, initialEdges, initialOperateName, operateIcon, open]);
 
 
     const handleSave = () => {
@@ -148,7 +163,7 @@ const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initi
             operate_name: operateName,
             operate_nodes: JSON.stringify(data?.nodes),
             operate_edges: JSON.stringify(data?.edges),
-            operate_icon: selectedIcon, // 添加图标字段
+            operate_icon: selectedIcon, // 使用当前选择的图标
             user_id: Number(user_id),
         };
 
@@ -168,8 +183,11 @@ const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initi
             if (res.code === 200) {
                 messageApi.success(isEdit ? "修改成功" : "保存成功");
                 setIsModalOpen(false);
-                setOperateName("");
-                setSelectedIcon("/icon/js.jpg"); // 重置图标选择
+                // 只在新建模式下重置操作名称，编辑模式保持不变
+                if (!isEdit) {
+                    setOperateName("");
+                    setSelectedIcon("/new.svg");
+                }
                 handleDrawerClose();
                 window.location.reload();
             } else {
@@ -183,7 +201,7 @@ const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initi
 
     const handleModalCancel = () => {
         setIsModalOpen(false);
-        // setOperateName("");
+        // 不重置操作名称和图标选择，保持用户当前的选择
     };
 
     const handleDelete = () => {
@@ -227,7 +245,7 @@ const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initi
         setNodes([]);
         setEdges([]);
         setOperateName("");
-        setSelectedIcon("/icon/js.jpg"); // 重置图标选择
+        setSelectedIcon("/new.svg"); // 关闭时重置为默认图标
         setIsModalOpen(false);
         setIsDeleteModalOpen(false);
 
@@ -236,138 +254,239 @@ const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initi
         if (onClose) onClose();
     };
 
+    // 自定义抽屉标题
+    const DrawerTitle = () => (
+        <div className="drawer-header">
+            <div className="drawer-title-content">
+                <div className="drawer-title-icon">
+                    {isEdit ? <EditOutlined /> : <PlusOutlined />}
+                </div>
+                <div className="drawer-title-text">
+                    <Title level={4} style={{ margin: 0, color: '#1f2937' }}>
+                        {isEdit ? "修改操作" : "新增操作"}
+                    </Title>
+                    <Text type="secondary" style={{ fontSize: '12px' }}>
+                        {isEdit ? "编辑现有的自动化操作流程" : "创建新的自动化操作流程"}
+                    </Text>
+                </div>
+            </div>
+        </div>
+    );
+
     return (
         <>
             {contextHolder}
             <Drawer
                 open={open}
                 onClose={handleDrawerClose}
-                title={isEdit ? "修改操作" : "新增操作"}
-                width={800}
+                title={<DrawerTitle />}
+                width={900}
+                className="modern-drawer"
+                styles={{
+                    header: {
+                        borderBottom: '1px solid #f0f0f0',
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        padding: '16px 24px',
+                    },
+                    body: {
+                        padding: 0,
+                        background: '#fafafa',
+                    }
+                }}
+                closeIcon={<CloseOutlined style={{ color: '#fff', fontSize: '16px' }} />}
             >
-                <OperateX6
-                    ref={operateX6Ref}
-                    elements={elements}
-                    skills={skills}
-                    rgbs={colors}
-                    nodes={nodes}
-                    edges={edges}
-                />
-                {/* 右下角操作按钮 */}
-                <div className="x6-action">
-                    <button
-                        className="x6-action-success-button"
-                        onClick={handleSave}
-                    >
-                        {isEdit ? "修改" : "保存"}
-                    </button>
-                    {isEdit && (
-                        <button
-                            className="x6-action-danger-button"
-                            onClick={handleDelete}
-                        >
-                            删除
-                        </button>
-                    )}
+                <div className="drawer-content">
+                    {/* 工具栏 */}
+                    <div className="drawer-toolbar">
+                        <div className="toolbar-info">
+                            <Text strong style={{ color: '#1f2937' }}>操作设计器</Text>
+                            <Text type="secondary" style={{ fontSize: '12px' }}>
+                                拖拽组件到画布中设计您的自动化流程
+                            </Text>
+                        </div>
+                    </div>
+
+                    {/* X6 编辑器容器 */}
+                    <div className="x6-container">
+                        <OperateX6
+                            ref={operateX6Ref}
+                            elements={elements}
+                            skills={skills}
+                            rgbs={colors}
+                            nodes={nodes}
+                            edges={edges}
+                        />
+                    </div>
+
+                    {/* 底部操作栏 */}
+                    <div className="drawer-footer">
+                        <div className="footer-content">
+                            <div className="footer-info">
+                                <Text type="secondary" style={{ fontSize: '12px' }}>
+                                    💡 提示：起始节点必须是按键组件
+                                </Text>
+                            </div>
+                            <div className="footer-actions">
+                                <Button
+                                    size="large"
+                                    onClick={handleDrawerClose}
+                                    style={{ marginRight: 12 }}
+                                >
+                                    取消
+                                </Button>
+                                {isEdit && (
+                                    <Button
+                                        size="large"
+                                        danger
+                                        icon={<DeleteOutlined />}
+                                        onClick={handleDelete}
+                                        style={{ marginRight: 12 }}
+                                    >
+                                        删除
+                                    </Button>
+                                )}
+                                <Button
+                                    size="large"
+                                    type="primary"
+                                    icon={<SaveOutlined />}
+                                    onClick={handleSave}
+                                    className="save-button"
+                                >
+                                    {isEdit ? "修改" : "保存"}
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </Drawer>
+
+            {/* 美化后的保存模态框 */}
             <Modal
-                title={isEdit ? "修改操作名称" : "请输入操作名称"}
+                title={
+                    <div style={{ textAlign: 'center', padding: '10px 0' }}>
+                        <Title level={4} style={{ margin: 0, color: '#1f2937' }}>
+                            {isEdit ? "修改操作配置" : "保存操作配置"}
+                        </Title>
+                        <Text type="secondary">
+                            {isEdit ? "修改操作名称和图标" : "为您的操作设置名称和图标"}
+                        </Text>
+                    </div>
+                }
                 open={isModalOpen}
                 onOk={handleModalOk}
                 onCancel={handleModalCancel}
                 okText="确定"
                 cancelText="取消"
-                width={600}
+                width={700}
+                className="modern-modal"
+                okButtonProps={{
+                    size: 'large',
+                    icon: <SaveOutlined />
+                }}
+                cancelButtonProps={{
+                    size: 'large'
+                }}
             >
-                <Space direction="vertical" style={{ width: '100%' }} size="large">
-                    <div>
-                        <label style={{ marginBottom: 8, display: 'block', fontWeight: 500 }}>
-                            操作名称
-                        </label>
-                        <Input
-                            placeholder="请输入操作名称"
-                            value={operateName}
-                            onChange={e => setOperateName(e.target.value)}
-                        />
-                    </div>
-
-                    <div>
-                        <label style={{ marginBottom: 12, display: 'block', fontWeight: 500 }}>
-                            选择图标
-                        </label>
-                        <Radio.Group
-                            value={selectedIcon}
-                            onChange={e => setSelectedIcon(e.target.value)}
-                            style={{ width: '100%' }}
+                <div style={{ padding: '20px 0' }}>
+                    <Space direction="vertical" style={{ width: '100%' }} size="large">
+                        {/* 操作名称输入 */}
+                        <Card
+                            size="small"
+                            title="操作名称"
+                            className="config-card"
                         >
-                            <div style={{
-                                display: 'grid',
-                                gridTemplateColumns: 'repeat(4, 1fr)',
-                                gap: '12px',
-                                maxHeight: '300px',
-                                overflowY: 'auto',
-                                padding: '8px'
-                            }}>
-                                {iconOptions.map(icon => (
-                                    <Radio.Button
-                                        key={icon.value}
-                                        value={icon.value}
-                                        style={{
-                                            height: '80px',
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            padding: '8px',
-                                            border: selectedIcon === icon.value ? '2px solid #1890ff' : '1px solid #d9d9d9',
-                                            borderRadius: '6px',
-                                            background: selectedIcon === icon.value ? '#f0f8ff' : '#fff'
-                                        }}
-                                    >
-                                        <img
-                                            src={icon.value}
-                                            alt={icon.label}
-                                            style={{
-                                                width: '32px',
-                                                height: '32px',
-                                                objectFit: 'cover',
-                                                borderRadius: '4px',
-                                                marginBottom: '4px'
-                                            }}
-                                            onError={(e) => {
-                                                // 图片加载失败时显示默认图标
-                                                e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0xNiA4QzEyIDggOCAxMiA4IDE2UzEyIDI0IDE2IDI0UzI0IDIwIDI0IDE2UzIwIDggMTYgOFoiIGZpbGw9IiNEOUQ5RDkiLz4KPC9zdmc+';
-                                            }}
-                                        />
-                                        <span style={{
-                                            fontSize: '11px',
-                                            textAlign: 'center',
-                                            lineHeight: '1.2',
-                                            color: selectedIcon === icon.value ? '#1890ff' : '#666'
-                                        }}>
-                                            {icon.label}
-                                        </span>
-                                    </Radio.Button>
-                                ))}
-                            </div>
-                        </Radio.Group>
-                    </div>
-                </Space>
+                            <Input
+                                placeholder="请输入操作名称（例如：自动攻击、技能循环等）"
+                                value={operateName}
+                                onChange={e => setOperateName(e.target.value)}
+                                size="large"
+                                style={{ fontSize: '14px' }}
+                                maxLength={20}
+                                showCount
+                            />
+                        </Card>
+
+                        {/* 图标选择 */}
+                        <Card
+                            size="small"
+                            title="选择图标"
+                            className="config-card"
+                        >
+                            <Radio.Group
+                                value={selectedIcon}
+                                onChange={e => setSelectedIcon(e.target.value)}
+                                style={{ width: '100%' }}
+                            >
+                                <div className="icon-grid">
+                                    {iconOptions.map(icon => (
+                                        <div key={icon.value} className="icon-item">
+                                            <Radio.Button
+                                                value={icon.value}
+                                                className={`icon-radio ${selectedIcon === icon.value ? 'selected' : ''}`}
+                                            >
+                                                <div className="icon-content">
+                                                    <Avatar
+                                                        src={icon.value}
+                                                        size={40}
+                                                        style={{
+                                                            border: selectedIcon === icon.value ? `2px solid ${icon.color}` : '2px solid #f0f0f0',
+                                                            marginBottom: '8px'
+                                                        }}
+                                                    />
+                                                    <Text
+                                                        style={{
+                                                            fontSize: '12px',
+                                                            color: selectedIcon === icon.value ? icon.color : '#666',
+                                                            fontWeight: selectedIcon === icon.value ? 'bold' : 'normal'
+                                                        }}
+                                                    >
+                                                        {icon.label}
+                                                    </Text>
+                                                </div>
+                                            </Radio.Button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </Radio.Group>
+                        </Card>
+                    </Space>
+                </div>
             </Modal>
+
+            {/* 美化后的删除确认模态框 */}
             <Modal
-                title="确认删除"
+                title={
+                    <div style={{ textAlign: 'center', color: '#ff4d4f' }}>
+                        <DeleteOutlined style={{ fontSize: '24px', marginBottom: '8px' }} />
+                        <Title level={4} style={{ margin: 0, color: '#ff4d4f' }}>
+                            确认删除操作
+                        </Title>
+                    </div>
+                }
                 open={isDeleteModalOpen}
                 onOk={handleDeleteConfirm}
                 onCancel={handleDeleteCancel}
                 okText="确定删除"
                 cancelText="取消"
-                okButtonProps={{ danger: true }}
+                okButtonProps={{
+                    danger: true,
+                    size: 'large',
+                    icon: <DeleteOutlined />
+                }}
+                cancelButtonProps={{ size: 'large' }}
+                className="delete-modal"
             >
-                <p>确定要删除操作 "{operateName}" 吗？此操作不可撤销。</p>
+                <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                    <Text style={{ fontSize: '16px' }}>
+                        确定要删除操作 <Text strong style={{ color: '#1890ff' }}>"{operateName}"</Text> 吗？
+                    </Text>
+                    <br />
+                    <Text type="secondary" style={{ fontSize: '14px' }}>
+                        此操作不可撤销，删除后将无法恢复。
+                    </Text>
+                </div>
             </Modal>
         </>
-
     );
 });
 

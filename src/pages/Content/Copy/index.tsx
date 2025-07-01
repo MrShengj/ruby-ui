@@ -43,7 +43,7 @@ interface CopyProps {
 }
 
 const Copy: React.FC<CopyProps> = ({ open, onClose }) => {
-    const [searchValue, setSearchValue] = useState('6d85e77a079fcbc7149eda4fd8ec7031');
+    const [searchValue, setSearchValue] = useState('03d99ed9e85efc8e3e28021006728d77');
     const [operateList, setOperateList] = useState<OperateData[]>([]);
     const [loading, setLoading] = useState(false);
     const [syncingIds, setSyncingIds] = useState<Set<string>>(new Set());
@@ -155,7 +155,7 @@ const Copy: React.FC<CopyProps> = ({ open, onClose }) => {
                     <div className="search-section">
                         <Title level={5} className="section-title">
                             <UserOutlined className="section-icon" />
-                            用户搜索: 参考(6d85e77a079fcbc7149eda4fd8ec7031)
+                            用户搜索: 参考(03d99ed9e85efc8e3e28021006728d77)
                         </Title>
                         <Search
                             placeholder="请输入用户UID"
@@ -201,7 +201,7 @@ const Copy: React.FC<CopyProps> = ({ open, onClose }) => {
                                                         <div className="card-header">
                                                             <Avatar
                                                                 size={40}
-                                                                icon={<SyncOutlined />}
+                                                                src={item.operate_icon || '/new.svg'} // 使用默认图标或传入的图标
                                                                 className="operate-avatar"
                                                             />
                                                             <div className="operate-info">

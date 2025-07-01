@@ -76,6 +76,7 @@ const Operate = () => {
             nodes: operate.operate_nodes,
             edges: operate.operate_edges,
             operate_name: operate.operate_name,
+            operate_icon: operate.operate_icon, // 传入操作图标
             user_id: operate.user_id,
             id: operate.id
         });
@@ -117,6 +118,7 @@ const Operate = () => {
                 edges={editData?.edges}
                 operateName={editData?.operate_name}
                 operateId={editData?.id}
+                operateIcon={editData?.operate_icon} // 传入操作图标
                 isEdit={true}
             />
         </>

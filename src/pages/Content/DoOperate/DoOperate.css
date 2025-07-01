@@ -26,3 +26,291 @@
   cursor: pointer;
   font-size: 14px;
 }
+
+/* 现代化抽屉样式 */
+.modern-drawer .ant-drawer-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border-bottom: none !important;
+}
+
+.modern-drawer .ant-drawer-header .ant-drawer-title {
+  color: #fff !important;
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.drawer-title-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.drawer-title-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 18px;
+}
+
+.drawer-title-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.drawer-title-text .ant-typography {
+  color: #fff !important;
+}
+
+/* 抽屉内容区域 */
+.drawer-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #fafafa;
+}
+
+/* 工具栏 */
+.drawer-toolbar {
+  padding: 16px 24px;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.toolbar-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* X6编辑器容器 */
+.x6-container {
+  flex: 1;
+  position: relative;
+  background: #fff;
+  margin: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+/* 底部操作栏 */
+.drawer-footer {
+  background: #fff;
+  border-top: 1px solid #f0f0f0;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.footer-content {
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footer-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-actions {
+  display: flex;
+  align-items: center;
+}
+
+.save-button {
+  background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%);
+  border: none;
+  box-shadow: 0 2px 4px rgba(82, 196, 26, 0.3);
+}
+
+.save-button:hover {
+  background: linear-gradient(135deg, #73d13d 0%, #52c41a 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(82, 196, 26, 0.4);
+}
+
+/* 模态框样式 */
+.modern-modal .ant-modal-header {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 20px 24px;
+}
+
+.config-card {
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.config-card:hover {
+  border-color: #1890ff;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.1);
+}
+
+.config-card .ant-card-head {
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+  min-height: 40px;
+  padding: 0 16px;
+}
+
+.config-card .ant-card-head-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.config-card .ant-card-body {
+  padding: 16px;
+}
+
+/* 图标网格 */
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 12px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.icon-radio {
+  width: 100% !important;
+  height: auto !important;
+  padding: 16px 8px !important;
+  border-radius: 8px !important;
+  border: 2px solid #f0f0f0 !important;
+  background: #fff !important;
+  transition: all 0.3s ease !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  cursor: pointer !important;
+}
+
+.icon-radio:hover {
+  border-color: #1890ff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
+}
+
+.icon-radio.selected {
+  border-color: #1890ff !important;
+  background: #f6ffed !important;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+}
+
+.icon-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 删除模态框 */
+.delete-modal .ant-modal-header {
+  background: #fff2f0;
+  border-bottom: 1px solid #ffccc7;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .modern-drawer {
+    width: 100% !important;
+  }
+  
+  .drawer-toolbar {
+    padding: 12px 16px;
+  }
+  
+  .x6-container {
+    margin: 12px;
+  }
+  
+  .footer-content {
+    padding: 12px 16px;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .footer-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  
+  .icon-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* 滚动条样式 */
+.icon-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.icon-grid::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.icon-grid::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.icon-grid::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 动画效果 */
+.modern-drawer .ant-drawer-content {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.save-button,
+.footer-actions .ant-btn {
+  transition: all 0.3s ease;
+}
+
+.config-card {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
