@@ -52,14 +52,6 @@ pub fn run_element(elements: Vec<Children>, stop_flag: Arc<AtomicBool>) {
             }
             ElementEnum::TimeOrNama(t) => match t.t {
                 1 => {
-                    // println!("Delay for {} milliseconds", t.n);
-                    // let delay_duration = std::time::Duration::from_millis(t.n as u64);
-                    // let start = Instant::now();
-
-                    // // 使用忙等待确保精确延迟
-                    // while start.elapsed() < delay_duration {
-                    //     std::thread::yield_now();
-                    // }
                     thread::sleep(Duration::from_millis(t.n as u64));
                     handle_children(c.children.clone(), "y", &stop_flag);
                 }
@@ -70,8 +62,11 @@ pub fn run_element(elements: Vec<Children>, stop_flag: Arc<AtomicBool>) {
                     let mut last_time_map = TIME_CHECK_TIME.lock().unwrap();
                     let check_result = if let Some(last_time) = last_time_map.get(e_id) {
                         let duration = last_time.elapsed().as_millis();
-                        if duration < t.n.into() || duration >= out_wait_time.into() {
+                        if duration <= t.n.into() {
                             false
+                        } else if duration > out_wait_time.into() {
+                            last_time_map.remove(e_id);
+                            true
                         } else {
                             last_time_map.insert(e_id.clone(), now);
                             true

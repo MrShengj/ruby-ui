@@ -12,3 +12,16 @@ export const getRandomWarmColorGroup = () => {
     const randomIndex = Math.floor(Math.random() * warmColorGroups.length);
     return warmColorGroups[randomIndex];
 };
+
+export const TimeOrNamaLabel = (label: string) => {
+    switch (label) {
+        case "延迟":
+            return 1;
+        case "等待":
+            return 2;
+        case "内力":
+            return 3;
+        default:
+            return 0;
+    }
+}

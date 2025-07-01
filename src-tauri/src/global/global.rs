@@ -17,6 +17,6 @@ pub static ref SCREEN_HEIGHT: Mutex<u32> = Mutex::new(screen_height()); // 屏�
 pub static ref PROCESS_NAME: String = "Client.exe".to_string(); // 进程名称  "Client.exe"
 pub static ref TIME_WITE: u64 = 200; // 无任何操作的时候等待时长ms
 pub static ref GLOBAL_STOP_FLAG: Arc<AtomicBool> = Arc::new(AtomicBool::new(false)); // 全局停止标志
-pub static ref HOLD_ON_TIME: u64 = 100; // 长按时间ms
+pub static ref HOLD_ON_TIME: Mutex<u64> = Mutex::new(100); // 长按时间ms
 pub static ref TIME_CHECK_TIME: Mutex<HashMap<String, Instant>> = Mutex::new(HashMap::new());
 }

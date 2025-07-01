@@ -8,9 +8,7 @@ import {
 } from "@ant-design/icons";
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
-
 import logo from "../../assets/logo.svg";
-
 import { registerUser } from "../../api/system/user";
 
 const HeaderPage = () => {
@@ -59,8 +57,12 @@ const HeaderPage = () => {
     appWindow.minimize();
   };
 
-  const handleClose = () => {
-    appWindow.close();
+  const handleClose = async () => {
+    // appWindow.close();
+    // 隐藏窗口而不是关闭
+    await appWindow.hide();
+    // 创建托盘图标和菜单（如果还没有的话）
+    // await invoke("create_tray");
   };
 
   //   const handleMaximize = () => {

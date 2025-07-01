@@ -1,11 +1,11 @@
 {
   "productName": "ruby",
   "version": "0.1.0",
-  "identifier": "com.ruby-ui.app",
+  "identifier": "com.ruby-ui.desktop",
   "build": {
     "beforeDevCommand": "yarn dev",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "yarn build",
+    "beforeBuildCommand": "yarn build:prod",
     "frontendDist": "../dist"
   },
   "app": {
@@ -17,6 +17,7 @@
         "decorations": false,
         "transparent": true,
         "resizable": false,
+        "maximizable": false,
         "fullscreen": false,
         "useHttpsScheme": true
       }

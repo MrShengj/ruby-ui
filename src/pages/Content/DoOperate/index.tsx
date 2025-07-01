@@ -1,16 +1,16 @@
-import { Drawer, message, Modal, Input } from "antd";
+import { Drawer, message, Modal, Input, Radio, Space } from "antd";
 import React, { forwardRef, useEffect } from "react";
 import OperateX6 from "../../../components/OperateX6";
 import "./DoOperate.css";
-import { getElements, getSkills } from "../../../api/element";
-import { createOperate, updateOperate, deleteOperate } from "../../../api/operate"; // 添加deleteOperate导入
+import { getElements, getSkills, getUserRGB } from "../../../api/element";
+import { createOperate, updateOperate, deleteOperate } from "../../../api/operate";
 import { Operate } from "../../../model/operate";
 
 interface AddOperateProps {
     open?: boolean;
     nodes?: any[];
     edges?: any[];
-    operateName?: string; // 修正拼写错误
+    operateName?: string;
     operateId?: number;
     isEdit?: boolean;
     onClose?: () => void;
@@ -28,7 +28,21 @@ const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initi
     const operateX6Ref = React.useRef<any>(null);
     const [isModalOpen, setIsModalOpen] = React.useState(false);
     const [operateName, setOperateName] = React.useState("");
+    const [selectedIcon, setSelectedIcon] = React.useState("/new.svg"); // 默认图标
     const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
+
+    // 预设图标列表
+    const iconOptions = [
+        { value: "/new.svg", label: "默认" },
+        { value: "/icon/js.jpg", label: "剑士" },
+        { value: "/icon/ls.jpg", label: "力士" },
+        { value: "/icon/lj.jpg", label: "灵剑" },
+        { value: "/icon/qg.jpg", label: "气功" },
+        { value: "/icon/qs.jpg", label: "拳师" },
+        { value: "/icon/zh.jpg", label: "召唤" },
+        { value: "/icon/ck.jpg", label: "刺客" },
+        { value: "/icon/zs.jpg", label: "咒术" },
+    ];
 
     const getAllElements = async () => {
         await getElements().then((res) => {
@@ -49,14 +63,38 @@ const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initi
         })
     }
 
+    const getAllColors = async () => {
+        // 获取用户的取色数据
+        const userId = window.sessionStorage.getItem("id");
+        if (!userId) {
+            messageApi.error("用户未登录，请先登录");
+            return;
+        }
+        await getUserRGB({ user_id: Number(userId) }).then((res) => {
+            if (res.code === 200) {
+                console.log("获取取色数据成功:", res.data);
+                setColors(res.data);
+            } else {
+                messageApi.error("获取取色数据失败：" + res.msg);
+            }
+        }).catch((error) => {
+            console.error("获取取色数据失败:", error);
+            messageApi.error("获取取色数据失败");
+        });
+    }
+
     const getX6Elements = async () => {
         await getAllElements();
         await getAllSkills();
+        await getAllColors();
     }
 
     useEffect(() => {
-
         getX6Elements();
+    }, []);
+
+    useEffect(() => {
+
 
         // 如果是编辑模式，初始化数据
         if (isEdit && initialNodes && initialEdges && initialOperateName) {
@@ -92,7 +130,6 @@ const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initi
     const handleModalOk = async () => {
         const data = operateX6Ref.current?.getGraphData?.();
 
-        // 判断nodes第一个data值是否有个elements_code属性
         if (data?.nodes.length === 0 || !data?.nodes[0].data?.elements_code) {
             messageApi.error("起始必须是按键组件");
             return;
@@ -111,10 +148,10 @@ const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initi
             operate_name: operateName,
             operate_nodes: JSON.stringify(data?.nodes),
             operate_edges: JSON.stringify(data?.edges),
-            user_id: user_id
+            operate_icon: selectedIcon, // 添加图标字段
+            user_id: Number(user_id),
         };
 
-        // 如果是编辑模式，添加操作ID
         if (isEdit && operateId) {
             operate.id = operateId;
         }
@@ -122,20 +159,18 @@ const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initi
         try {
             let res;
             if (isEdit) {
-                // 调用更新API
                 console.log("编辑操作数据:", operate);
                 res = await updateOperate(operate);
             } else {
-                // 调用创建API
                 res = await createOperate(operate);
             }
 
             if (res.code === 200) {
                 messageApi.success(isEdit ? "修改成功" : "保存成功");
                 setIsModalOpen(false);
-                // 无论是编辑还是新增，都调用抽屉关闭方法来清理状态并刷新数据
+                setOperateName("");
+                setSelectedIcon("/icon/js.jpg"); // 重置图标选择
                 handleDrawerClose();
-                // 刷新页面
                 window.location.reload();
             } else {
                 messageApi.error((isEdit ? "修改失败：" : "保存失败：") + res.message);
@@ -148,7 +183,7 @@ const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initi
 
     const handleModalCancel = () => {
         setIsModalOpen(false);
-        setOperateName("");
+        // setOperateName("");
     };
 
     const handleDelete = () => {
@@ -192,6 +227,7 @@ const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initi
         setNodes([]);
         setEdges([]);
         setOperateName("");
+        setSelectedIcon("/icon/js.jpg"); // 重置图标选择
         setIsModalOpen(false);
         setIsDeleteModalOpen(false);
 
@@ -213,6 +249,7 @@ const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initi
                     ref={operateX6Ref}
                     elements={elements}
                     skills={skills}
+                    rgbs={colors}
                     nodes={nodes}
                     edges={edges}
                 />
@@ -241,12 +278,82 @@ const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initi
                 onCancel={handleModalCancel}
                 okText="确定"
                 cancelText="取消"
+                width={600}
             >
-                <Input
-                    placeholder="操作名称"
-                    value={operateName}
-                    onChange={e => setOperateName(e.target.value)}
-                />
+                <Space direction="vertical" style={{ width: '100%' }} size="large">
+                    <div>
+                        <label style={{ marginBottom: 8, display: 'block', fontWeight: 500 }}>
+                            操作名称
+                        </label>
+                        <Input
+                            placeholder="请输入操作名称"
+                            value={operateName}
+                            onChange={e => setOperateName(e.target.value)}
+                        />
+                    </div>
+
+                    <div>
+                        <label style={{ marginBottom: 12, display: 'block', fontWeight: 500 }}>
+                            选择图标
+                        </label>
+                        <Radio.Group
+                            value={selectedIcon}
+                            onChange={e => setSelectedIcon(e.target.value)}
+                            style={{ width: '100%' }}
+                        >
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(4, 1fr)',
+                                gap: '12px',
+                                maxHeight: '300px',
+                                overflowY: 'auto',
+                                padding: '8px'
+                            }}>
+                                {iconOptions.map(icon => (
+                                    <Radio.Button
+                                        key={icon.value}
+                                        value={icon.value}
+                                        style={{
+                                            height: '80px',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            padding: '8px',
+                                            border: selectedIcon === icon.value ? '2px solid #1890ff' : '1px solid #d9d9d9',
+                                            borderRadius: '6px',
+                                            background: selectedIcon === icon.value ? '#f0f8ff' : '#fff'
+                                        }}
+                                    >
+                                        <img
+                                            src={icon.value}
+                                            alt={icon.label}
+                                            style={{
+                                                width: '32px',
+                                                height: '32px',
+                                                objectFit: 'cover',
+                                                borderRadius: '4px',
+                                                marginBottom: '4px'
+                                            }}
+                                            onError={(e) => {
+                                                // 图片加载失败时显示默认图标
+                                                e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0xNiA4QzEyIDggOCAxMiA4IDE2UzEyIDI0IDE2IDI0UzI0IDIwIDI0IDE2UzIwIDggMTYgOFoiIGZpbGw9IiNEOUQ5RDkiLz4KPC9zdmc+';
+                                            }}
+                                        />
+                                        <span style={{
+                                            fontSize: '11px',
+                                            textAlign: 'center',
+                                            lineHeight: '1.2',
+                                            color: selectedIcon === icon.value ? '#1890ff' : '#666'
+                                        }}>
+                                            {icon.label}
+                                        </span>
+                                    </Radio.Button>
+                                ))}
+                            </div>
+                        </Radio.Group>
+                    </div>
+                </Space>
             </Modal>
             <Modal
                 title="确认删除"

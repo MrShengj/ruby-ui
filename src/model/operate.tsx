@@ -5,3 +5,10 @@ export interface Operate {
     operate_edges: string; // 操作连线
     user_id: number; // 用户ID
 }
+
+export interface UserRgb {
+    id?: number; // RGB ID
+    user_id: number; // 用户ID
+    coordinate: string; // 坐标
+    rgb: string; // RGB颜色值
+}

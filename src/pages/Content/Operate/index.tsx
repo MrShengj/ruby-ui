@@ -97,15 +97,17 @@ const Operate = () => {
         <>
             {contextHolder}
             <div className="operate">
-                <Row gutter={[20, 20]} justify="start">
-                    {operates.map((item, idx) => (
-                        <Col xs={24} sm={12} md={12} key={item.id || idx}>
-                            <div>
-                                <OperateCard operate={item} onEdit={handleEdit} />
-                            </div>
-                        </Col>
-                    ))}
-                </Row>
+                <div className="operate-content">
+                    <Row gutter={[20, 20]} justify="start">
+                        {operates.map((item, idx) => (
+                            <Col xs={24} sm={12} md={12} key={item.id || idx}>
+                                <div>
+                                    <OperateCard operate={item} onEdit={handleEdit} />
+                                </div>
+                            </Col>
+                        ))}
+                    </Row>
+                </div>
             </div>
             {/* 编辑弹窗 */}
             <DoOperate

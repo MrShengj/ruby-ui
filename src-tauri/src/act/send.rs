@@ -10,8 +10,8 @@ pub fn simulate_key(key: u32) {
     let e = enter_simulate_key(key as u16, false);
     match e {
         Ok(_) => {
-            let hold_on_time = *HOLD_ON_TIME;
-            thread::sleep(time::Duration::from_millis(hold_on_time as u64));
+            let hold_on_time = HOLD_ON_TIME.lock().unwrap();
+            thread::sleep(time::Duration::from_millis(*hold_on_time as u64));
         }
         Err(e) => {
             println!("Error: {:?}", e);

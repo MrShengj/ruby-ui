@@ -1,4 +1,4 @@
-import { Card, Avatar, Switch, Flex, Button, Tag, Tooltip } from 'antd';
+import { Card, Avatar, Switch, Flex, Button, Tag, Tooltip, message } from 'antd';
 import './OperateCard.css';
 import React, { useState, forwardRef, useRef, useEffect } from 'react';
 import { EditOutlined } from '@ant-design/icons';
@@ -74,11 +74,57 @@ const OperateCard = forwardRef(({ operate, onEdit }: Props, ref) => {
 
     const [open, setOpen] = useState(getInitialState);
     const [isHovered, setIsHovered] = useState(false);
+    const [messageApi, contextHolder] = message.useMessage();
 
     // 当open状态改变时，保存到sessionStorage
     useEffect(() => {
         sessionStorage.setItem(`operate_switch_${operate.id}`, JSON.stringify(open));
     }, [open, operate.id]);
+
+    // 监听模式切换事件
+    useEffect(() => {
+        const handleActionTypeChange = async (event: CustomEvent) => {
+            console.log('检测到模式切换:', event.detail.actionType);
+
+            // 如果当前操作是开启状态，需要重新启动
+            if (open) {
+                console.log(`操作 ${operate.operate_name} 正在重新启动...`);
+
+                // 先停止当前操作
+                const elementsData = handleConvertOperateData();
+                if (elementsData) {
+                    try {
+                        await invoke('down', { elements: [elementsData], t: false });
+                        console.log('停止操作成功');
+
+                        // 短暂延迟后重新启动
+                        setTimeout(async () => {
+                            try {
+                                await invoke('run', { elements: [elementsData], t: true });
+                                console.log('重新启动操作成功');
+                                messageApi.success(`${operate.operate_name} 已在新模式下重新启动`);
+                            } catch (error) {
+                                console.error('重新启动操作失败:', error);
+                                messageApi.error('重新启动操作失败');
+                            }
+                        }, 100);
+
+                    } catch (error) {
+                        console.error('停止操作失败:', error);
+                        messageApi.error('停止操作失败');
+                    }
+                }
+            }
+        };
+
+        // 添加事件监听器
+        window.addEventListener('actionTypeChange', handleActionTypeChange as EventListener);
+
+        // 清理函数
+        return () => {
+            window.removeEventListener('actionTypeChange', handleActionTypeChange as EventListener);
+        };
+    }, [open, operate.operate_name, messageApi]);
 
     // 转换函数：将 nodes 和 edges 转换为 Elements 结构
     const convertToElements = (nodes: NodeData[], edges: EdgeData[]): Elements | null => {
@@ -267,22 +313,31 @@ const OperateCard = forwardRef(({ operate, onEdit }: Props, ref) => {
     };
 
     const handleSwitchClick = async (event: boolean) => {
+        const status = window.sessionStorage.getItem("operate_status");
+        if (status === "running" && event) {
+            // 如果当前状态是运行中，且再次点击开启，则不进行任何操作
+            messageApi.warning("操作已在运行中，请先停止当前操作");
+            return;
+        }
         setOpen(event);
         // 开关切换时可以触发数据转换和保存
         const elementsData = handleConvertOperateData();
         if (event) {
             if (elementsData) {
-                // console.log("启用操作 - 转换数据:", elementsData);
+                console.log("启用操作 - 转换数据:", elementsData);
                 // 这里可以调用API保存转换后的数据
                 await invoke('run', { elements: [elementsData], t: event })
+                // elementsData转换成
+                window.sessionStorage.setItem("operate_status", "running");
             }
         } else {
             await invoke('down', { elements: [elementsData], t: event });
+            window.sessionStorage.setItem("operate_status", "stopped");
         }
     };
 
     const operateLogo = () => {
-        return "/new.svg"
+        return "/new.svg"; // 默认操作图标
     }
 
     // 暴露转换方法给父组件使用
@@ -292,85 +347,89 @@ const OperateCard = forwardRef(({ operate, onEdit }: Props, ref) => {
     }));
 
     return (
-        <div
-            className="operate-card-wrapper"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-        >
-            <Card
-                style={{
-                    width: 280,
-                    marginTop: 12,
-                    padding: 0,
-                    position: "relative",
-                    borderRadius: 12,
-                    boxShadow: isHovered
-                        ? '0 8px 32px rgba(0, 0, 0, 0.12)'
-                        : '0 2px 8px rgba(0, 0, 0, 0.06)',
-                    transition: 'all 0.3s ease',
-                    transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
-                    border: open ? '2px solid #1890ff' : '1px solid #f0f0f0',
-                    background: '#ffffff',
-                }}
-                onDoubleClick={click}
-                onContextMenu={handleRightClick}
-                styles={{ body: { padding: '16px' } }}
+        <>
+            {contextHolder}
+            <div
+                className="operate-card-wrapper"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
             >
-                {/* 状态指示器 */}
-                <div className="status-indicator">
-                    <div className={`status-dot ${open ? 'active' : 'inactive'}`} />
-                </div>
+                <Card
+                    style={{
+                        width: 280,
+                        marginTop: 12,
+                        padding: 0,
+                        position: "relative",
+                        borderRadius: 12,
+                        boxShadow: isHovered
+                            ? '0 8px 32px rgba(0, 0, 0, 0.12)'
+                            : '0 2px 8px rgba(0, 0, 0, 0.06)',
+                        transition: 'all 0.3s ease',
+                        transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
+                        border: open ? '2px solid #1890ff' : '1px solid #f0f0f0',
+                        background: '#ffffff',
+                    }}
+                    onDoubleClick={click}
+                    onContextMenu={handleRightClick}
+                    styles={{ body: { padding: '16px' } }}
+                >
+                    {/* 状态指示器 */}
+                    <div className="status-indicator">
+                        <div className={`status-dot ${open ? 'active' : 'inactive'}`} />
+                    </div>
 
-                {/* 右上角开关 */}
-                <div className="switch-container">
-                    <Tooltip title={open ? "点击关闭" : "点击开启"}>
-                        <Switch
-                            size="small"
-                            checked={open}
-                            className="operate-switch"
-                            onChange={handleSwitchClick}
-                        />
-                    </Tooltip>
-                </div>
-
-                {/* 主要内容区域 */}
-                <div className="card-main-content">
-                    <div className="card-header">
-                        <div className="avatar-section">
-                            <Avatar
-                                size={48}
-                                src={operateLogo()}
-                                shape="square"
-                                style={{
-                                    borderRadius: 8,
-                                    border: '2px solid #f0f0f0'
-                                }}
+                    {/* 右上角开关 */}
+                    <div className="switch-container">
+                        <Tooltip title={open ? "点击关闭" : "点击开启"}>
+                            <Switch
+                                size="small"
+                                checked={open}
+                                className="operate-switch"
+                                onChange={handleSwitchClick}
                             />
-                        </div>
-                        <div className="content-section">
-                            <div className="title-row">
-                                <div className="operate-title">
-                                    {operate.operate_name || "未命名操作"}
-                                </div>
-                                {/* 编辑按钮 */}
-                                <div className={`edit-button ${isHovered ? 'visible' : ''}`}>
-                                    <Tooltip title="编辑操作">
-                                        <Button
-                                            type="text"
-                                            shape="circle"
-                                            size="small"
-                                            icon={<EditOutlined />}
-                                            onClick={() => onEdit && onEdit(operate)}
-                                            className="action-btn edit-btn"
-                                        />
-                                    </Tooltip>
+                        </Tooltip>
+                    </div>
+
+                    {/* 主要内容区域 */}
+                    <div className="card-main-content">
+                        <div className="card-header">
+                            <div className="avatar-section">
+                                <Avatar
+                                    size={48}
+                                    src={operate.operate_icon || operateLogo()}
+                                    shape="square"
+                                    style={{
+                                        borderRadius: 8,
+                                        border: '2px solid #f0f0f0'
+                                    }}
+                                />
+                            </div>
+                            <div className="content-section">
+                                <div className="title-row">
+                                    <div className="operate-title">
+                                        {operate.operate_name || "未命名操作"}
+                                    </div>
+                                    {/* 编辑按钮 */}
+                                    <div className={`edit-button ${isHovered ? 'visible' : ''}`}>
+                                        <Tooltip title="编辑操作">
+                                            <Button
+                                                type="text"
+                                                shape="circle"
+                                                size="small"
+                                                icon={<EditOutlined />}
+                                                onClick={() => onEdit && onEdit(operate)}
+                                                className="action-btn edit-btn"
+                                            />
+                                        </Tooltip>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </Card>
-        </div>
+                </Card>
+            </div>
+        </>
+
     )
 });
 

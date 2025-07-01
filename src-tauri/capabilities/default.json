@@ -8,11 +8,12 @@
     "opener:default",
     "core:window:allow-minimize",
     "core:window:allow-close",
+    "core:window:allow-hide",
     {
       "identifier": "http:default",
       "allow": [
         { "url": "http://localhost:8080" },
-        { "url": "http://clash.cwzy.js.cn:10000" }
+        { "url": "http://clash.cwzy.js.cn:11000" }
       ],
       "deny": [{ "url": "https://private.tauri.app" }]
     }

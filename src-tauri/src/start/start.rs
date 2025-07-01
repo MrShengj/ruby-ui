@@ -3,12 +3,13 @@ use std::thread;
 use device_query::{DeviceQuery, DeviceState, Keycode};
 
 use crate::{
-    act::mouse::mouse_type,
+    act::{keyboard::keyboard_type, mouse::mouse_type},
     global::{
-        global::{MODE_CLOSE, STOP_ACTION, TIME_WITE},
+        global::{HOLD_ON_TIME, MODE_CLOSE, STOP_ACTION, TIME_CHECK_TIME, TIME_WITE},
         init::{init_global_hdc_screen, release_global_hdc_screen},
         model::Elements,
     },
+    user::user::get_hod_on_time,
 };
 
 /**
@@ -17,9 +18,20 @@ use crate::{
  */
 pub fn start(element: Vec<Elements>, t: bool) {
     if t {
+        // get_hod_on_time 通过用户配置修改HOLD_ON_TIME
+        let user_set_hold_on_time = get_hod_on_time();
+        {
+            let mut hold_on_time = HOLD_ON_TIME.lock().unwrap();
+            *hold_on_time = match user_set_hold_on_time {
+                Ok(val) => val as u64,
+                Err(_) => *hold_on_time, // or provide a default value, e.g. 1000
+            };
+        }
+
         init_global_hdc_screen(); // 初始化全局屏幕句柄
     } else {
         release_global_hdc_screen(); // 释放全局屏幕句柄
+        TIME_CHECK_TIME.lock().unwrap().clear(); // 清除时间检查缓存
         return;
     }
     // 设置关闭标识为false 表示开启状态
@@ -33,6 +45,7 @@ pub fn start(element: Vec<Elements>, t: bool) {
             mouse_type(e.clone());
         } else {
             // 这些都是键盘代码，使用键盘监听
+            keyboard_type(e.clone());
         }
     }
 }

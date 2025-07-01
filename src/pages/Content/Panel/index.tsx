@@ -10,8 +10,9 @@ import {
     Card,
     Typography,
 } from "antd";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { listen } from "@tauri-apps/api/event";
+import { getVersion } from '@tauri-apps/api/app';
 import "./Panel.css";
 import BlurCircle from "./BlurCircle";
 import ActionDrawer from "./ActionDrawer";
@@ -20,29 +21,65 @@ import { invoke } from '@tauri-apps/api/core';
 const Panel = () => {
     const [actionTypeValue, setActionTypeValue] = useState(1);
     const [stopAction, setStopAction] = useState(false);
+    const [appVersion, setAppVersion] = useState("加载中...");
+    const [hodOn, setHoldOn] = useState(100);
 
     const blurCircleRef = useRef(null);
+
+    // 获取应用版本号
+    useEffect(() => {
+        const fetchVersion = async () => {
+            try {
+                const version = await getVersion();
+                setAppVersion(version);
+            } catch (error) {
+                console.error('获取版本号失败:', error);
+                setAppVersion("未知版本");
+            }
+        };
+
+        const fetchHoldOn = async () => {
+            const hdo = await invoke("read_user_hold_on");
+            console.log("获取用户配置中的长按时间:", hdo);
+            setHoldOn(hdo);
+        };
+
+        fetchVersion();
+        fetchHoldOn();
+    }, []);
 
     listen("stop_action", (event: any) => {
         // console.log("Received stop_action event:", event);
         if (event.target !== stopAction) {
             if (blurCircleRef.current) {
-                blurCircleRef.current.setColorName(event.payload);
+                blurCircleRef.current.setStatus(!event.payload);
             }
         }
     });
 
+    // const action_type = async (event) => {
+    //     setActionTypeValue(event.target.value);
+    //     await invoke("change_action_type", { t: event.target.value });
+    // };
+
     const action_type = async (event) => {
-        setActionTypeValue(event.target.value);
-        await invoke("change_action_type", { t: event.target.value });
+        const newValue = event.target.value;
+        setActionTypeValue(newValue);
+        await invoke("change_action_type", { t: newValue });
+
+        // 模式切换时，触发自定义事件通知OperateCard重新启动
+        const actionTypeChangeEvent = new CustomEvent('actionTypeChange', {
+            detail: { actionType: newValue }
+        });
+        window.dispatchEvent(actionTypeChangeEvent);
     };
 
     return (
-        <div className="panel">2222222
+        <div className="panel">
             <Row gutter={[24, 24]}>
                 <Col span={24}>
                     <div className="circle-container">
-                        <Typography.Title level={4}>版本号: 0.1.0</Typography.Title>
+                        <Typography.Title level={4}>版本号: {appVersion}</Typography.Title>
                     </div>
                 </Col>
                 <Col span={24}>
@@ -76,21 +113,38 @@ const Panel = () => {
                 </Col>
                 <Col span={24}>
                     <div className="circle-container">
-                        <Typography.Text style={{ marginRight: 12, fontSize: 14 }} >
-                            按键时长(ms):
-                        </Typography.Text>
-                        <InputNumber
-                            min={0}
-                            max={10000}
-                            defaultValue={100}
-                            style={{ width: "50%" }}
-                            placeholder="请输入按键时长"
-                            onChange={(value) => {
-                                if (value !== undefined) {
-                                    // invoke("set_key_press_duration", { duration: value });
-                                }
-                            }}
-                        />
+                        <Space align="center" style={{ width: '80%', justifyContent: 'space-between' }}>
+                            <Typography.Text
+                                style={{
+                                    fontSize: 14,
+                                    fontWeight: 500,
+                                    color: '#4a5568'
+                                }}
+                            >
+                                HDO:
+                            </Typography.Text>
+                            <InputNumber
+                                min={0}
+                                max={10000}
+                                value={hodOn}
+                                style={{
+                                    width: 120,
+                                    borderRadius: '6px'
+                                }}
+                                placeholder="请输入时长"
+                                size="middle"
+                                controls={{
+                                    upIcon: '▲',
+                                    downIcon: '▼'
+                                }}
+                                onChange={(value) => {
+                                    if (value !== undefined) {
+                                        setHoldOn(value);
+                                        invoke("update_user_hold_on", { duration: value });
+                                    }
+                                }}
+                            />
+                        </Space>
                     </div>
                 </Col>
             </Row>

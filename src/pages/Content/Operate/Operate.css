@@ -1,9 +1,34 @@
 .operate {
-  padding: 36px 48px;
-  background-color: #f0f2f5;
+  /* 设置容器占满父级的全部空间 */
+  width: 100%;
+  min-height: 100vh; /* 至少占满整个视口高度 */
+  height: 100%; /* 占满父级高度 */
+  background-color: #f0f2f5; /* 设置您想要的背景色 */
+  padding: 20px; /* 添加内边距 */
+  box-sizing: border-box;
 }
 
 .operate-card-wrapper {
   position: relative;
   margin-bottom: 16px; /* 添加底部间距 */
+}
+
+.operate-content {
+  /* 内容区域样式 */
+  width: 100%;
+  max-width: 1200px; /* 可选：设置最大宽度 */
+  margin: 0 auto; /* 可选：居中显示 */
+}
+
+/* 如果您的父容器需要设置高度，也可以这样做 */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* 确保根容器也占满高度 */
+#root {
+  height: 100%;
 }
