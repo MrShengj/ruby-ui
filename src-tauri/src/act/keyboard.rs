@@ -176,7 +176,7 @@ fn click(elements: Elements) {
                 *trigger = false; // 重置触发标志
                 running = !running; // 切换运行状态
 
-                println!("状态切换: running = {}", running); // 调试日志
+                // println!("状态切换: running = {}", running); // 调试日志
 
                 // 立即处理状态变化
                 if !running {
@@ -184,7 +184,7 @@ fn click(elements: Elements) {
                     if let Some(handle) = worker.take() {
                         GLOBAL_STOP_FLAG.store(true, Ordering::Relaxed);
                         let _ = handle.join(); // 等待线程结束
-                        println!("工作线程已停止");
+                                               // println!("工作线程已停止");
                     }
                 }
             }
@@ -204,9 +204,9 @@ fn click(elements: Elements) {
                             // 控制循环频率
                             thread::sleep(Duration::from_millis(*TIME_WITE));
                         }
-                        println!("工作线程正在退出");
+                        // println!("工作线程正在退出");
                     }));
-                    println!("工作线程已启动");
+                    // println!("工作线程已启动");
                 }
             }
 
@@ -221,9 +221,9 @@ fn click(elements: Elements) {
         // 退出前确保工作线程完全结束
         if let Some(handle) = worker {
             GLOBAL_STOP_FLAG.store(true, Ordering::Relaxed);
-            println!("等待工作线程结束...");
+            // println!("等待工作线程结束...");
             let _ = handle.join();
-            println!("工作线程已结束");
+            // println!("工作线程已结束");
         }
     });
 }

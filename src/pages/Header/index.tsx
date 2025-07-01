@@ -69,7 +69,7 @@ const HeaderPage = () => {
   //     appWindow.toggleMaximize();
   //   };
   const handleOpenGithub = () => {
-    window.open("https://gitee.com/mrshengjing/ks-rev", "_blank");
+    window.open("https://github.com/MrShengj/ruby-ui", "_blank");
   };
 
   return (
