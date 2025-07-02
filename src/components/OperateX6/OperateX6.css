@@ -80,3 +80,42 @@
   color: #222;
   border-bottom: 1px solid #f0f0f0;
 }
+
+/* 连线动画效果 */
+@keyframes ant-line {
+  to {
+    stroke-dashoffset: -1000;
+  }
+}
+
+/* 连线悬停效果 */
+.x6-edge:hover .x6-edge-path {
+  stroke: #1890ff !important;
+  stroke-width: 3px !important;
+}
+
+/* 连线选中效果 */
+.x6-edge.x6-edge-selected .x6-edge-path {
+  stroke: #1890ff !important;
+  stroke-width: 3px !important;
+  stroke-dasharray: 5, 5;
+  animation: ant-line 0.3s infinite linear;
+}
+
+/* 端口显示/隐藏控制 */
+.x6-port-body {
+  visibility: hidden;
+}
+
+.x6-node:hover .x6-port-body {
+  visibility: visible;
+}
+
+/* 端口样式美化 */
+.x6-port-body {
+  transition: all 0.2s ease;
+}
+
+.x6-port-body:hover {
+  transform: scale(1.2);
+}

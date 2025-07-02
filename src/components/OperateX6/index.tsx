@@ -424,7 +424,10 @@ const OperateX6 = forwardRef<any, OperateX6Props>(({
             setBtn.onclick = () => {
                 setModalLabel(type);
                 const nodeData = node.getData();
-                const existingValue = nodeData?.waitValue || (label.match(/\d+/)?.[0] || "");
+                // const existingValue = nodeData?.waitValue || (label.match(/\d+/)?.[0] || "");
+                const existingValue = nodeData?.n ||
+                    (label.match(/\d+/)?.[0] ? parseInt(label.match(/\d+/)[0]) : null) ||
+                    0;
                 setModalValue(existingValue);
                 setEditingNode(node);
                 setModalVisible(true);
@@ -591,49 +594,146 @@ const OperateX6 = forwardRef<any, OperateX6Props>(({
             selecting: false,
             interacting: { nodeMovable: true, edgeMovable: false },
             panning: true,
-            mousewheel: true,
+            mousewheel: {
+                enabled: true,
+                zoomAtMousePosition: true,
+                modifiers: 'ctrl',
+                minScale: 0.5,
+                maxScale: 3,
+            },
             connecting: {
-                // 添加智能路由
-                router: 'manhattan',
-                // 添加圆角连接器
+                // 使用曼哈顿路由，自动避开节点
+                router: {
+                    name: 'manhattan',
+                    args: {
+                        padding: 1,
+                    },
+                },
+                // 使用圆角连接器，让连线更美观
                 connector: {
                     name: 'rounded',
                     args: {
-                        radius: 8,
+                        radius: 10,
                     },
                 },
-                sourceAnchor: 'center',
-                targetAnchor: 'center',
+                // 连接点配置
+                anchor: 'center',
+                connectionPoint: 'anchor',
                 allowBlank: false,
                 allowLoop: false,
-                highlight: true,
-                snap: true,
                 allowNode: false,
                 allowEdge: false,
                 allowPort: true,
+                highlight: true,
+                // 磁吸配置
+                snap: {
+                    radius: 20,
+                },
                 // 自定义连线创建
                 createEdge() {
                     return new Shape.Edge({
                         attrs: {
                             line: {
-                                stroke: '#A2B1C3',
+                                stroke: '#5F95FF',
                                 strokeWidth: 2,
                                 targetMarker: {
-                                    name: 'block',
-                                    width: 12,
+                                    name: 'ellipse',
+                                    width: 8,
                                     height: 8,
+                                    fill: '#5F95FF',
+                                    stroke: '#5F95FF',
+                                    strokeWidth: 1,
+                                    rx: 4,
+                                    ry: 4,
+                                },
+                                // 或者使用自定义的圆润箭头
+                                // targetMarker: {
+                                //     tagName: 'path',
+                                //     fill: '#5F95FF',
+                                //     stroke: '#5F95FF',
+                                //     strokeWidth: 1,
+                                //     d: 'M 0 0 Q 5 1.5 10 3 Q 5 4.5 0 6 Q 3 3 0 0 Z',
+                                // },
+                                // 添加连线动画效果
+                                strokeDasharray: 0,
+                                style: {
+                                    animation: 'ant-line 30s infinite linear',
                                 },
                             },
                         },
                         zIndex: 0,
+                        // 添加连线标签样式
+                        defaultLabel: {
+                            markup: [
+                                {
+                                    tagName: 'rect',
+                                    selector: 'body',
+                                },
+                                {
+                                    tagName: 'text',
+                                    selector: 'label',
+                                },
+                            ],
+                            attrs: {
+                                label: {
+                                    fill: '#5F95FF',
+                                    fontSize: 12,
+                                    textAnchor: 'middle',
+                                    textVerticalAnchor: 'middle',
+                                    pointerEvents: 'none',
+                                },
+                                body: {
+                                    ref: 'label',
+                                    fill: '#fff',
+                                    stroke: '#5F95FF',
+                                    strokeWidth: 1,
+                                    rx: 4,
+                                    ry: 4,
+                                    refWidth: '140%',
+                                    refHeight: '140%',
+                                    refX: '-20%',
+                                    refY: '-20%',
+                                },
+                            },
+                            position: {
+                                distance: 0.5,
+                                options: {
+                                    absoluteDistance: true,
+                                    reverseDistance: true,
+                                },
+                            },
+                        },
                     })
                 },
                 // 验证连接
-                validateConnection({ targetMagnet }) {
-                    return !!targetMagnet
+                validateConnection({ sourceView, targetView, sourceMagnet, targetMagnet }) {
+                    // 不允许连接到自己
+                    if (sourceView === targetView) {
+                        return false
+                    }
+                    // 必须连接到端口
+                    if (!sourceMagnet || !targetMagnet) {
+                        return false
+                    }
+                    // 不允许重复连接
+                    const sourcePortId = sourceMagnet.getAttribute('port')
+                    const targetPortId = targetMagnet.getAttribute('port')
+                    const sourceNode = sourceView.cell
+                    const targetNode = targetView.cell
+
+                    // 检查是否已存在相同的连接
+                    const edges = graphRef.current?.getEdges() || []
+                    const duplicateEdge = edges.find(edge =>
+                        edge.getSourceCellId() === sourceNode.id &&
+                        edge.getTargetCellId() === targetNode.id &&
+                        edge.getSourcePortId() === sourcePortId &&
+                        edge.getTargetPortId() === targetPortId
+                    )
+
+                    return !duplicateEdge
                 },
             },
-            // 添加高亮效果
+            // 高亮效果配置
             highlighting: {
                 magnetAdsorbed: {
                     name: 'stroke',
@@ -641,6 +741,17 @@ const OperateX6 = forwardRef<any, OperateX6Props>(({
                         attrs: {
                             fill: '#5F95FF',
                             stroke: '#5F95FF',
+                            strokeWidth: 3,
+                        },
+                    },
+                },
+                magnetAvailable: {
+                    name: 'stroke',
+                    args: {
+                        attrs: {
+                            fill: '#fff',
+                            stroke: '#5F95FF',
+                            strokeWidth: 2,
                         },
                     },
                 },
