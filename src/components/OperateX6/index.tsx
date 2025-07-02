@@ -636,16 +636,18 @@ const OperateX6 = forwardRef<any, OperateX6Props>(({
                             line: {
                                 stroke: '#5F95FF',
                                 strokeWidth: 2,
-                                targetMarker: {
-                                    name: 'ellipse',
-                                    width: 8,
-                                    height: 8,
-                                    fill: '#5F95FF',
-                                    stroke: '#5F95FF',
-                                    strokeWidth: 1,
-                                    rx: 4,
-                                    ry: 4,
-                                },
+                                targetMarker: null,
+                                sourceMarker: null,
+                                // targetMarker: {
+                                //     name: 'ellipse',
+                                //     width: 8,
+                                //     height: 8,
+                                //     fill: '#5F95FF',
+                                //     stroke: '#5F95FF',
+                                //     strokeWidth: 1,
+                                //     rx: 4,
+                                //     ry: 4,
+                                // },
                                 // 或者使用自定义的圆润箭头
                                 // targetMarker: {
                                 //     tagName: 'path',
