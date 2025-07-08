@@ -1,10 +1,11 @@
-import { Avatar, Button, Badge, message } from "antd";
+import { Avatar, Button, Badge, message, Modal } from "antd";
 import "./Header.css";
 import { useEffect, useState } from "react";
 import {
   CloseOutlined,
   GithubOutlined,
   MinusOutlined,
+  ExclamationCircleOutlined,
 } from "@ant-design/icons";
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
@@ -14,6 +15,7 @@ import { registerUser } from "../../api/system/user";
 const HeaderPage = () => {
 
   const [messageApi, contextHolder] = message.useMessage();
+  const [modal, modalContextHolder] = Modal.useModal();
   const appWindow = getCurrentWebviewWindow();
   const [uuid, setUuid] = useState("**************************");
   const getUid = async () => {
@@ -58,16 +60,33 @@ const HeaderPage = () => {
   };
 
   const handleClose = async () => {
-    // appWindow.close();
-    // 隐藏窗口而不是关闭
-    await appWindow.hide();
-    // 创建托盘图标和菜单（如果还没有的话）
-    // await invoke("create_tray");
+    modal.confirm({
+      title: '关闭应用',
+      icon: <ExclamationCircleOutlined />,
+      content: '请选择关闭方式：',
+      okText: '最小化到托盘',
+      cancelText: '退出程序',
+      okButtonProps: {
+        type: 'primary',
+        style: { background: '#52c41a', borderColor: '#52c41a' }
+      },
+      cancelButtonProps: {
+        danger: true
+      },
+      onOk: async () => {
+        // 最小化到托盘
+        await appWindow.hide();
+        messageApi.success('应用已最小化到系统托盘');
+      },
+      onCancel: async () => {
+        // 退出程序
+        console.log("退出程序");
+        await invoke("close_app");
+      },
+      autoFocusButton: 'ok', // 默认聚焦在确定按钮（最小化到托盘）
+    });
   };
 
-  //   const handleMaximize = () => {
-  //     appWindow.toggleMaximize();
-  //   };
   const handleOpenGithub = () => {
     window.open("https://github.com/MrShengj/ruby-ui", "_blank");
   };
@@ -75,6 +94,7 @@ const HeaderPage = () => {
   return (
     <>
       {contextHolder}
+      {modalContextHolder}
       <div className="headerContainer" data-tauri-drag-region>
         <Avatar className="avatar" src={logo} /> {/* 使用 PNG 图像 */}
         <div className="uidContainer">
@@ -103,7 +123,6 @@ const HeaderPage = () => {
         </div>
       </div>
     </>
-
   );
 }
 

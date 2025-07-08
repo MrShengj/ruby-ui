@@ -1,27 +1,55 @@
 .stencil-app {
   display: flex;
+  height: 100%;
   width: 100%;
-  height: 81vh; /* 设置高度为视口高度 */
-  padding: 0;
-  font-family: sans-serif;
-  overflow: hidden; /* 隐藏超出视口的滚动条 */
 }
 
 .app-stencil {
-  position: relative;
-  width: 200px;
-  border: 1px solid #f0f0f0;
-  height: 100%; /* 让侧边栏高度铺满父元素 */
+  flex-shrink: 0;
+  width: 180px;
+  height: 100%;
+  overflow: hidden;
 }
 
 .app-content {
   flex: 1;
-  height: 100%; /* 让内容区域高度铺满父元素 */
-  margin-right: 8px;
-  margin-left: 8px;
-  border-radius: 5px;
-  box-shadow: 0 12px 5px -10px rgb(0 0 0 / 10%), 0 0 4px 0 rgb(0 0 0 / 10%);
-  overflow-y: auto; /* 尝试让 app-content 内部滚动 */
+  height: 100%;
+  overflow: hidden;
+}
+
+/* 确保 stencil 容器有正确的高度和滚动 */
+.x6-widget-stencil {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.x6-widget-stencil-title {
+  flex-shrink: 0;
+}
+
+.x6-widget-stencil-content {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  max-height: none !important;
+  height: auto !important;
+}
+
+/* 确保每个分组都能正常显示 */
+.x6-widget-stencil-group {
+  margin-bottom: 10px;
+}
+
+.x6-widget-stencil-group:last-child {
+  margin-bottom: 20px; /* 给最后一个分组添加底部间距 */
+  padding-bottom: 20px;
+}
+
+/* 如果还是被遮挡，可以给整个 stencil 内容区域添加底部padding */
+.x6-widget-stencil-content::after {
+  content: "";
+  display: block;
+  height: 50px; /* 调整这个值来确保有足够的底部空间 */
 }
 
 .x6-context-menu {

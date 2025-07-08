@@ -47,6 +47,8 @@ pub fn run() {
             sys::create_tray,               // 创建托盘
             sys::update_user_hold_on,       // 更新用户配置
             sys::read_user_hold_on,         // 读取用户配置中的长按时间
+            sys::clean_memory,              // 清理进程内存
+            sys::close_app,                 // 关闭应用
         ])
         .setup(|app| {
             // 初始化用户配置目录

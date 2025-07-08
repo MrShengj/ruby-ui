@@ -1,17 +1,24 @@
 .panel {
-  padding: 12px;
+  padding: 8px; /* 减少padding */
   border-radius: 8px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   position: relative;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  /* 添加最小高度和高度设置 */
-  min-height: 120px;
-  height: 100%;
+  /* 调整高度设置 */
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  /* 隐藏滚动条但保持滚动功能 */
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* 隐藏webkit滚动条 */
+.panel::-webkit-scrollbar {
+  display: none;
 }
 
 .panel::before {
@@ -31,9 +38,9 @@
 }
 
 .panel:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15), 0 0 20px rgba(56, 207, 255, 0.3);
-  border: 1px solid rgba(56, 207, 255, 0.5);
+  transform: translateY(-2px) scale(1.01); /* 减少变换幅度 */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12), 0 0 15px rgba(56, 207, 255, 0.2);
+  border: 1px solid rgba(56, 207, 255, 0.3);
 }
 
 .panel:hover::before {
@@ -41,23 +48,23 @@
 }
 
 .panel:active {
-  transform: translateY(-2px) scale(1.01);
+  transform: translateY(-1px) scale(1.005);
   transition: all 0.1s;
 }
 
 .remark {
-  font-size: 16px;
+  font-size: 14px; /* 减小字体 */
   color: #888;
   font-weight: 500;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  line-height: normal;
-  gap: 2px;
+  line-height: 1.2; /* 减少行高 */
+  gap: 1px; /* 减少间距 */
   transition: color 0.3s ease;
-  /* 让文本区域也能伸缩 */
-  flex: 1;
+  flex: 0 0 auto; /* 不伸缩 */
+  padding: 4px 0; /* 减少padding */
 }
 
 .panel:hover .remark {
@@ -68,39 +75,40 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  /* 修改高度设置 */
   height: auto;
-  min-height: 50px;
+  min-height: 40px; /* 减少最小高度 */
   flex-shrink: 0;
+  margin-bottom: 8px; /* 减少间距 */
+  padding: 4px 0; /* 减少padding */
 }
 
 .circle {
-  width: 30px;
-  height: 30px;
+  width: 24px; /* 减小尺寸 */
+  height: 24px;
   border-radius: 50%;
   background-color: red;
-  filter: blur(4px);
+  filter: blur(3px);
   transition: all 0.3s ease;
 }
 
 .panel:hover .circle {
-  filter: blur(2px);
-  box-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
+  filter: blur(1px);
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
   animation: pulse 1.5s infinite;
 }
 
 .active {
-  width: 30px;
-  height: 30px;
+  width: 24px; /* 减小尺寸 */
+  height: 24px;
   border-radius: 50%;
   background-color: green;
-  filter: blur(4px);
+  filter: blur(3px);
   transition: all 0.3s ease;
 }
 
 .panel:hover .active {
-  filter: blur(2px);
-  box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
+  filter: blur(1px);
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
   animation: pulse 1.5s infinite;
 }
 
@@ -109,7 +117,7 @@
     transform: scale(1);
   }
   50% {
-    transform: scale(1.1);
+    transform: scale(1.05); /* 减少缩放幅度 */
   }
   100% {
     transform: scale(1);
@@ -118,10 +126,10 @@
 
 .gradient-divider {
   border-top: 0;
-  height: 8px;
-  margin: 16px 0;
+  height: 6px; /* 减少高度 */
+  margin: 8px 0; /* 减少边距 */
   background: linear-gradient(90deg, #ff4069 0%, #ffb86c 50%, #38cfff 100%);
-  border-radius: 8px;
+  border-radius: 6px;
   opacity: 1;
   background-size: 200% 200%;
   animation: gradient-move 4s ease-in-out infinite;
@@ -130,9 +138,9 @@
 }
 
 .panel:hover .gradient-divider {
-  height: 10px;
+  height: 7px; /* 减少悬停高度 */
   animation-duration: 2s;
-  box-shadow: 0 0 10px rgba(255, 64, 105, 0.5);
+  box-shadow: 0 0 8px rgba(255, 64, 105, 0.4);
 }
 
 @keyframes gradient-move {
@@ -154,210 +162,207 @@
 
 @keyframes glow {
   from {
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15), 0 0 20px rgba(56, 207, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12), 0 0 15px rgba(56, 207, 255, 0.2);
   }
   to {
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2), 0 0 30px rgba(56, 207, 255, 0.5);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15), 0 0 20px rgba(56, 207, 255, 0.3);
   }
 }
 
-/* 如果需要确保父容器也有足够的高度 */
-.panel-container {
-  height: 100%;
-  min-height: 200px;
-}
-
-/* 如果是在 Grid 或 Flex 布局中，确保行高度一致 */
-.panel-row {
-  height: 100%;
-  display: flex;
-  align-items: stretch;
-}
-
-.panel-row .panel {
-  flex: 1;
-}
-
-/* BlurCircle 样式 */
+/* BlurCircle 完整样式定义 */
 .blur-circle-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 16px;
+  gap: 4px;
+  padding: 8px;
 }
 
 .blur-circle {
   position: relative;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 50%;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-  user-select: none;
 }
 
-/* 尺寸变体 */
+/* 尺寸样式 */
 .blur-circle--small {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
 }
 
 .blur-circle--medium {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
 }
 
 .blur-circle--large {
-  width: 64px;
-  height: 64px;
+  width: 52px;
+  height: 52px;
 }
 
-/* 状态样式 */
-.blur-circle--inactive {
-  background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
-  box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.1),
-    inset 0 1px 2px rgba(255, 255, 255, 0.3);
-}
-
-.blur-circle--active {
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  box-shadow: 
-    0 4px 16px rgba(59, 130, 246, 0.4),
-    inset 0 1px 2px rgba(255, 255, 255, 0.2);
-}
-
-/* 动画状态 */
-.blur-circle--animating {
-  transform: scale(1.1);
-}
-
-/* 内部结构 */
+/* 核心圆点 */
 .blur-circle__inner {
   position: relative;
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .blur-circle__core {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 60%;
-  height: 60%;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
 }
 
-/* 脉冲效果 */
+/* 状态样式 */
+.blur-circle--inactive .blur-circle__core {
+  background-color: #ff4444;
+  filter: blur(3px);
+  box-shadow: 0 0 10px rgba(255, 68, 68, 0.3);
+}
+
+.blur-circle--active .blur-circle__core {
+  background-color: #44ff44;
+  filter: blur(1px);
+  box-shadow: 0 0 15px rgba(68, 255, 68, 0.6);
+  animation: pulse 1.5s infinite;
+}
+
+/* 动画效果 */
+.blur-circle--animating {
+  transform: scale(1.1);
+}
+
+/* Pulse 变体 */
 .blur-circle--pulse .blur-circle__pulse {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
-  animation: pulse 2s infinite;
+  background: inherit;
+  opacity: 0.7;
+  animation: pulse-ring 2s infinite;
 }
 
-.blur-circle--active.blur-circle--pulse .blur-circle__pulse {
-  background: rgba(59, 130, 246, 0.3);
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
 }
 
-.blur-circle--inactive.blur-circle--pulse .blur-circle__pulse {
-  background: rgba(148, 163, 184, 0.3);
-}
-
-/* 发光效果 */
+/* Glow 变体 */
 .blur-circle--glow .blur-circle__glow {
   position: absolute;
-  top: -20%;
-  left: -20%;
-  right: -20%;
-  bottom: -20%;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
   border-radius: 50%;
-  filter: blur(8px);
-  opacity: 0.6;
-  animation: glow 3s ease-in-out infinite alternate;
+  background: radial-gradient(
+    circle,
+    rgba(68, 255, 68, 0.3) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .blur-circle--active.blur-circle--glow .blur-circle__glow {
-  background: radial-gradient(circle, #3b82f6, transparent);
-}
-
-.blur-circle--inactive.blur-circle--glow .blur-circle__glow {
-  background: radial-gradient(circle, #94a3b8, transparent);
-}
-
-/* 内容区域 */
-.blur-circle__content {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 12px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  opacity: 1;
 }
 
 /* 状态文本 */
 .blur-circle__status-text {
   font-size: 12px;
+  color: #666;
   font-weight: 500;
-  color: #64748b;
   text-align: center;
+  margin-top: 4px;
   transition: color 0.3s ease;
 }
 
-.blur-circle--active ~ .blur-circle__status-text {
-  color: #3b82f6;
+.blur-circle--active ~ .blur-circle__status-text,
+.blur-circle-container:has(.blur-circle--active) .blur-circle__status-text {
+  color: #44ff44;
+}
+
+.blur-circle--inactive ~ .blur-circle__status-text,
+.blur-circle-container:has(.blur-circle--inactive) .blur-circle__status-text {
+  color: #ff4444;
 }
 
 /* 悬停效果 */
-.blur-circle:hover {
-  transform: scale(1.05);
+.panel:hover .blur-circle--inactive .blur-circle__core {
+  filter: blur(1px);
+  box-shadow: 0 0 15px rgba(255, 68, 68, 0.5);
 }
 
-.blur-circle:active {
-  transform: scale(0.95);
+.panel:hover .blur-circle--active .blur-circle__core {
+  filter: blur(0.5px);
+  box-shadow: 0 0 20px rgba(68, 255, 68, 0.8);
 }
 
-/* 动画定义 */
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 0.7;
-  }
-  50% {
-    transform: scale(1.2);
-    opacity: 0.3;
-  }
+/* 内容区域（如果有子元素） */
+.blur-circle__content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
 }
 
-@keyframes glow {
-  from {
-    opacity: 0.4;
-  }
-  to {
-    opacity: 0.8;
-  }
+/* 确保Row和Col之间的间距更紧凑 */
+.panel .ant-row {
+  gap: 8px !important; /* 减少行间距 */
 }
 
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .blur-circle-container {
-    padding: 12px;
-  }
-  
-  .blur-circle--large {
-    width: 56px;
-    height: 56px;
-  }
+.panel .ant-col {
+  margin-bottom: 4px !important; /* 减少列间距 */
+}
+
+.panel .ant-col:last-child {
+  margin-bottom: 8px !important; /* 最后一个元素的底部间距 */
+}
+
+/* 如果是在特定容器中，确保容器允许滚动但隐藏滚动条 */
+.content-wrapper,
+.panel-wrapper {
+  height: 100%;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.content-wrapper::-webkit-scrollbar,
+.panel-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+/* 圆形容器样式调整 */
+.circle-container {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 4px; /* 减少间距 */
 }

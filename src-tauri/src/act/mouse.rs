@@ -28,10 +28,9 @@ pub fn mouse_type(elements: Elements) {
 fn hold_on(elements: Elements) {
     thread::spawn(move || {
         let mut current_thread: Option<thread::JoinHandle<()>> = None;
+        let mut was_key_down = false; // 添加状态跟踪
 
         loop {
-            let start = std::time::Instant::now();
-
             // 判断是否关闭
             if *MODE_CLOSE.lock().unwrap() {
                 break;
@@ -49,39 +48,48 @@ fn hold_on(elements: Elements) {
                 _ => false,
             };
 
-            GLOBAL_STOP_FLAG.store(!key_down, Ordering::Relaxed);
-
-            if key_down {
-                // 启动新线程执行子元素
-                if current_thread
-                    .as_ref()
-                    .map(|t| t.is_finished())
-                    .unwrap_or(true)
+            // 检测按键状态变化
+            if key_down && !was_key_down {
+                // 按键刚刚按下，启动循环执行线程
+                if current_thread.is_none()
+                    || current_thread
+                        .as_ref()
+                        .map(|t| t.is_finished())
+                        .unwrap_or(true)
                 {
+                    GLOBAL_STOP_FLAG.store(false, Ordering::Relaxed);
                     let elements_c = elements.clone();
                     let stop_flag = GLOBAL_STOP_FLAG.clone();
                     current_thread = Some(thread::spawn(move || {
-                        if stop_flag.load(Ordering::Relaxed) {
-                            return;
-                        }
-                        if let Some(children) = &elements_c.children {
-                            run_element(children.clone(), stop_flag.clone());
+                        // 持续循环执行，直到停止标志被设置
+                        while !stop_flag.load(Ordering::Relaxed) {
+                            if let Some(children) = &elements_c.children {
+                                run_element(children.clone(), stop_flag.clone());
+                            }
+                            // 检查是否需要停止
+                            if stop_flag.load(Ordering::Relaxed) {
+                                break;
+                            }
+                            // 移除 TIME_WITE 等待，让 run_element 连续执行
                         }
                     }));
                 }
-            } else if let Some(handle) = current_thread.take() {
-                // 没有按下时等待线程结束
-                let _ = handle.join();
+            } else if !key_down && was_key_down {
+                // 按键刚刚释放，停止执行
+                GLOBAL_STOP_FLAG.store(true, Ordering::Relaxed);
+                if let Some(handle) = current_thread.take() {
+                    let _ = handle.join();
+                }
             }
 
+            was_key_down = key_down;
+
             // 控制循环频率
-            let elapsed = start.elapsed();
-            let wait_time = Duration::from_millis(*TIME_WITE);
-            if elapsed < wait_time {
-                thread::sleep(wait_time - elapsed);
-            }
+            thread::sleep(Duration::from_millis(10)); // 降低检测频率
         }
+
         // 退出前确保线程结束
+        GLOBAL_STOP_FLAG.store(true, Ordering::Relaxed);
         if let Some(handle) = current_thread {
             let _ = handle.join();
         }
@@ -93,10 +101,9 @@ fn click(elements: Elements) {
     thread::spawn(move || {
         let mut running = false;
         let mut worker: Option<thread::JoinHandle<()>> = None;
+        let mut was_key_down = false; // 添加状态跟踪
 
         loop {
-            let start = std::time::Instant::now();
-
             // 判断是否关闭
             if *MODE_CLOSE.lock().unwrap() {
                 break;
@@ -114,38 +121,39 @@ fn click(elements: Elements) {
                 _ => false,
             };
 
-            if key_down {
+            // 只在按键状态从未按下变为按下时切换状态
+            if key_down && !was_key_down {
                 running = !running; // 切换运行状态
-            }
-            GLOBAL_STOP_FLAG.store(!running, Ordering::Relaxed); // 确保标志为false
-                                                                 // 检测按下沿（从未按下到按下）
-            if running {
-                // 启动循环线程
-                let elements_c = elements.clone();
-                let stop_flag = GLOBAL_STOP_FLAG.clone();
-                worker = Some(thread::spawn(move || {
-                    while !stop_flag.load(Ordering::Relaxed) {
-                        if let Some(children) = &elements_c.children {
-                            run_element(children.clone(), stop_flag.clone());
+                GLOBAL_STOP_FLAG.store(!running, Ordering::Relaxed);
+                
+                if running {
+                    // 启动循环线程
+                    let elements_c = elements.clone();
+                    let stop_flag = GLOBAL_STOP_FLAG.clone();
+                    worker = Some(thread::spawn(move || {
+                        while !stop_flag.load(Ordering::Relaxed) {
+                            if let Some(children) = &elements_c.children {
+                                run_element(children.clone(), stop_flag.clone());
+                            }
+                            // 移除 TIME_WITE 等待，让 run_element 连续执行
                         }
-                        // 控制循环频率
-                        thread::sleep(Duration::from_millis(*TIME_WITE));
+                    }));
+                } else {
+                    // 停止循环线程
+                    if let Some(handle) = worker.take() {
+                        let _ = handle.join();
                     }
-                }));
-            } else {
-                // 停止循环线程
-                if let Some(handle) = worker.take() {
-                    let _ = handle.join();
                 }
             }
 
+            was_key_down = key_down;
+
             // 控制主循环频率
-            let elapsed = start.elapsed();
-            let wait_time = Duration::from_millis(*TIME_WITE);
-            if elapsed < wait_time {
-                thread::sleep(wait_time - elapsed);
-            }
+            thread::sleep(Duration::from_millis(10));
         }
+        
+        // 确保退出时停止工作线程
+        GLOBAL_STOP_FLAG.store(true, Ordering::Relaxed);
         if let Some(handle) = worker {
             let _ = handle.join();
         }

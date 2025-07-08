@@ -825,10 +825,15 @@ const OperateX6 = forwardRef<any, OperateX6Props>(({
             let ports = portsConfig.delay;
 
             if (node.data?.elements_code === 4 || node.data?.elements_code === 5) {
-                ports = portsConfig.singleY;
-            } else if (node.data?.skill_name || node.label === "取色" ||
-                ["等待", "内力"].some(type => node.label?.startsWith(type))) {
-                ports = portsConfig.normal;
+                ports = portsConfig.singleY; // 单个端口
+            } else if (
+                node.data?.skill_name ||
+                node.label === "取色" ||
+                node.data?.rgb || // 添加这个条件，检查是否有RGB数据
+                node.data?.coordinate || // 添加这个条件，检查是否有坐标数据
+                ["等待", "内力"].some(type => node.label?.startsWith(type))
+            ) {
+                ports = portsConfig.normal; // 三个端口
             }
 
             return { ...node, ports };

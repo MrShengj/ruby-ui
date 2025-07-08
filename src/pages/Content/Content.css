@@ -1,6 +1,6 @@
 .content {
   background: #f0f2f5;
-  min-height: calc(100vh - 64px); /* Adjust for header height */
+  min-height: calc(100vh - 64px) !important; /* Adjust for header height */
 }
 
 .content .ant-layout {
@@ -41,4 +41,33 @@
 .content .ant-layout-content:hover {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
   transform: translateY(-4px) scale(1.03);
+}
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 8px;
+  border: "1px solid #e8e8e8";
+}
+
+.content-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.content-header-button {
+  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
+  border: "none";
+  border-radius: "20px";
+  padding: "4px 16px";
+  height: "36px";
+  font-weight: 500;
+  box-shadow: "0 4px 12px rgba(102, 126, 234, 0.4)";
+  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)";
 }

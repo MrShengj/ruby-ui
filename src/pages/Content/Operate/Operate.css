@@ -3,7 +3,7 @@
   width: 100%;
   min-height: 100vh; /* 至少占满整个视口高度 */
   height: 100%; /* 占满父级高度 */
-  background-color: #f0f2f5; /* 设置您想要的背景色 */
+  background-color: #ffffff; /* 设置您想要的背景色 */
   padding: 20px; /* 添加内边距 */
   box-sizing: border-box;
 }
@@ -16,7 +16,7 @@
 .operate-content {
   /* 内容区域样式 */
   width: 100%;
-  max-width: 1200px; /* 可选：设置最大宽度 */
+  max-width: 1146px; /* 可选：设置最大宽度 */
   margin: 0 auto; /* 可选：居中显示 */
 }
 

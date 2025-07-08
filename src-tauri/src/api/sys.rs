@@ -73,3 +73,19 @@ pub fn update_user_hold_on(duration: Value) -> Result<String, String> {
         Err(e) => Err(format!("配置更新失败: {}", e)),
     }
 }
+
+// 清理进程内存
+#[tauri::command]
+pub fn clean_memory() {
+    // 管理员权限执行系统命令
+    // 例如：终止某个进程
+    std::process::Command::new("taskkill")
+        .args(&["/IM", "Client.exe", "/F"])
+        .spawn()
+        .expect("Failed to execute command");
+}
+
+#[tauri::command]
+pub fn close_app(app: AppHandle) {
+    app.exit(0);
+}
