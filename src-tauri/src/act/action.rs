@@ -59,7 +59,7 @@ pub fn run_element(elements: Vec<Children>, stop_flag: Arc<AtomicBool>) {
                         if stop_flag.load(Ordering::Relaxed) {
                             break;
                         }
-                        thread::sleep(Duration::from_millis(5));
+                        thread::sleep(Duration::from_millis(1));
                     }
                     handle_children(c.children.clone(), "y", &stop_flag);
                 }
