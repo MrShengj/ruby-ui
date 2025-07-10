@@ -52,7 +52,15 @@ pub fn run_element(elements: Vec<Children>, stop_flag: Arc<AtomicBool>) {
             }
             ElementEnum::TimeOrNama(t) => match t.t {
                 1 => {
-                    thread::sleep(Duration::from_millis(t.n as u64));
+                    // thread::sleep(Duration::from_millis(t.n as u64));
+                    let sleep_duration = Duration::from_millis(t.n as u64);
+                    let start_time = Instant::now();
+                    while start_time.elapsed() < sleep_duration {
+                        if stop_flag.load(Ordering::Relaxed) {
+                            break;
+                        }
+                        thread::sleep(Duration::from_millis(5));
+                    }
                     handle_children(c.children.clone(), "y", &stop_flag);
                 }
                 2 => {

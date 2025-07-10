@@ -1,4 +1,8 @@
-use std::{sync::atomic::Ordering, thread, time::Duration};
+use std::{
+    sync::atomic::Ordering,
+    thread,
+    time::{Duration, Instant},
+};
 
 use windows::Win32::UI::Input::KeyboardAndMouse::GetAsyncKeyState;
 
@@ -62,9 +66,14 @@ fn hold_on(elements: Elements) {
                     let stop_flag = GLOBAL_STOP_FLAG.clone();
                     current_thread = Some(thread::spawn(move || {
                         // 持续循环执行，直到停止标志被设置
+                        let mut cycle_count = 0;
                         while !stop_flag.load(Ordering::Relaxed) {
                             if let Some(children) = &elements_c.children {
+                                let start_time = Instant::now();
                                 run_element(children.clone(), stop_flag.clone());
+                                let execution_time = start_time.elapsed();
+                                cycle_count += 1;
+                                println!("run_element cycle {}: {:?}", cycle_count, execution_time);
                             }
                             // 检查是否需要停止
                             if stop_flag.load(Ordering::Relaxed) {
