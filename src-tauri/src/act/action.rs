@@ -35,7 +35,7 @@ pub fn run_element(elements: Vec<Children>, stop_flag: Arc<AtomicBool>) {
 
         match &c.element {
             ElementEnum::Element(e) => {
-                simulate_key(e.elements_code);
+                let _ = simulate_key(e.elements_code);
                 handle_children(c.children.clone(), "y", &stop_flag);
             }
             ElementEnum::Skill(s) => {

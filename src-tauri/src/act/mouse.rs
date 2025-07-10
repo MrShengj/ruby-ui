@@ -125,7 +125,7 @@ fn click(elements: Elements) {
             if key_down && !was_key_down {
                 running = !running; // 切换运行状态
                 GLOBAL_STOP_FLAG.store(!running, Ordering::Relaxed);
-                
+
                 if running {
                     // 启动循环线程
                     let elements_c = elements.clone();
@@ -151,7 +151,7 @@ fn click(elements: Elements) {
             // 控制主循环频率
             thread::sleep(Duration::from_millis(10));
         }
-        
+
         // 确保退出时停止工作线程
         GLOBAL_STOP_FLAG.store(true, Ordering::Relaxed);
         if let Some(handle) = worker {

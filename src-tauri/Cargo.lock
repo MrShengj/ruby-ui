@@ -3607,6 +3607,7 @@ dependencies = [
  "lazy_static",
  "mac_address",
  "md-5",
+ "once_cell",
  "rdev",
  "serde",
  "serde_json",
