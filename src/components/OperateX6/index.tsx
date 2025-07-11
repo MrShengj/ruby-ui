@@ -199,7 +199,7 @@ const OperateX6 = forwardRef<any, OperateX6Props>(({
             const ports = isSpecialType ? portsConfig.singleY : portsConfig.delay;
 
             return new Shape.Rect({
-                width: 60,
+                width: 80,
                 height: 36,
                 attrs: {
                     body: { fill: "#fffbe6", stroke: labelColor, rx: 8, ry: 8 },
@@ -209,6 +209,7 @@ const OperateX6 = forwardRef<any, OperateX6Props>(({
                 data: {
                     elements_code: element.elements_code,
                     elements_key: element.elements_key,
+                    key_up_delay: 0, // 默认按键弹起延迟为0
                 },
             });
         });
@@ -324,6 +325,22 @@ const OperateX6 = forwardRef<any, OperateX6Props>(({
         const label = node.attr("label/text");
         const nodeData = node.getData();
 
+        // 按键组件的菜单 - 添加这个新的部分
+        if (nodeData?.elements_code || nodeData?.elements_key) {
+            const delayBtn = document.createElement("div");
+            delayBtn.className = "x6-context-menu-item";
+            delayBtn.innerText = "弹起延迟";
+            delayBtn.onclick = () => {
+                setModalLabel("弹起延迟");
+                const existingDelay = nodeData?.key_up_delay || 0;
+                setModalValue(existingDelay);
+                setEditingNode(node);
+                setModalVisible(true);
+                menu.remove();
+            };
+            menu.appendChild(delayBtn);
+        }
+
         // 取色相关菜单
         if (label === "取色" || nodeData?.rgb) {
             const colorBtn = document.createElement("div");
@@ -393,7 +410,6 @@ const OperateX6 = forwardRef<any, OperateX6Props>(({
                                 setTimeout(() => {
                                     refreshColorComponents();
                                 }, 100);
-                                // messageApi.success("取色组件已永久删除");
                             } catch (error) {
                                 messageApi.error("删除失败");
                             }
@@ -424,7 +440,6 @@ const OperateX6 = forwardRef<any, OperateX6Props>(({
             setBtn.onclick = () => {
                 setModalLabel(type);
                 const nodeData = node.getData();
-                // const existingValue = nodeData?.waitValue || (label.match(/\d+/)?.[0] || "");
                 const existingValue = nodeData?.n ||
                     (label.match(/\d+/)?.[0] ? parseInt(label.match(/\d+/)[0]) : null) ||
                     0;
@@ -515,19 +530,37 @@ const OperateX6 = forwardRef<any, OperateX6Props>(({
     // Modal 处理函数
     const handleTimeEdit = useCallback(() => {
         if (editingNode && modalValue !== null) {
-            const labelText = modalLabel === "内力"
-                ? `${modalLabel} <= ${modalValue}`
-                : `${modalLabel} ${modalValue}ms`;
+            if (modalLabel === "弹起延迟") {
+                // 处理弹起延迟设置
+                const currentData = editingNode.getData();
+                editingNode.setData({
+                    ...currentData,
+                    key_up_delay: modalValue
+                });
 
-            editingNode.attr("label/text", labelText);
-            editingNode.setData({
-                n: modalValue,
-                t: TimeOrNamaLabel(modalLabel)
-            });
+                // 更新节点显示，可以在按键文本后添加延迟标识
+                const currentLabel = editingNode.attr("label/text");
+                const baseLabel = currentLabel.replace(/ \(\d+ms\)$/, ''); // 移除之前的延迟标识
+                const newLabel = modalValue > 0 ? `${baseLabel} (${modalValue}ms)` : baseLabel;
+                editingNode.attr("label/text", newLabel);
+
+                messageApi.success(`按键弹起延迟设置为 ${modalValue}ms`);
+            } else {
+                // 处理其他时间设置
+                const labelText = modalLabel === "内力"
+                    ? `${modalLabel} <= ${modalValue}`
+                    : `${modalLabel} ${modalValue}ms`;
+
+                editingNode.attr("label/text", labelText);
+                editingNode.setData({
+                    n: modalValue,
+                    t: TimeOrNamaLabel(modalLabel)
+                });
+            }
             triggerChange();
         }
         setModalVisible(false);
-    }, [editingNode, modalValue, modalLabel, triggerChange]);
+    }, [editingNode, modalValue, modalLabel, triggerChange, messageApi]);
 
     const handleSaveColor = useCallback(async () => {
         if (savingColorData && colorName.trim()) {
@@ -868,7 +901,11 @@ const OperateX6 = forwardRef<any, OperateX6Props>(({
             </div>
 
             <Modal
-                title={modalLabel === "内力" ? "设置内力小于等于" : `设置${modalLabel}时间`}
+                title={
+                    modalLabel === "内力" ? "设置内力小于等于" :
+                        modalLabel === "弹起延迟" ? "设置按键弹起延迟" :
+                            `设置${modalLabel}时间`
+                }
                 open={modalVisible}
                 onOk={handleTimeEdit}
                 onCancel={() => {
@@ -883,7 +920,14 @@ const OperateX6 = forwardRef<any, OperateX6Props>(({
                 <InputNumber
                     value={modalValue}
                     onChange={setModalValue}
-                    placeholder={modalLabel === "内力" ? "请输入内力点数" : "请输入毫秒"}
+                    placeholder={
+                        modalLabel === "内力" ? "请输入内力点数" :
+                            modalLabel === "弹起延迟" ? "请输入延迟毫秒数" :
+                                "请输入毫秒"
+                    }
+                    min={0}
+                    max={modalLabel === "弹起延迟" ? 10000 : undefined}
+                    style={{ width: '100%' }}
                 />
             </Modal>
 

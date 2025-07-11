@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 pub struct Element {
     pub elements_key: String,
     pub elements_code: u32,
+    pub key_up_delay: u32, // 按键弹起延迟，单位毫秒
 }
 
 #[derive(Debug, Deserialize, Clone, Serialize, Default)]

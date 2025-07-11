@@ -116,7 +116,7 @@ const Panel = () => {
                         </div>
 
                     </Col>
-                    <Col span={24}>
+                    {/* <Col span={24}>
                         <div className="circle-container">
                             <Space align="center" style={{ width: '80%', justifyContent: 'space-between' }}>
                                 <Typography.Text
@@ -151,7 +151,7 @@ const Panel = () => {
                                 />
                             </Space>
                         </div>
-                    </Col>
+                    </Col> */}
                     <Col span={24}>
                         <div className="circle-container">
                             <Button

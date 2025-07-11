@@ -5,26 +5,26 @@ use windows::Win32::UI::Input::KeyboardAndMouse::{
     MAPVK_VK_TO_VSC, VIRTUAL_KEY,
 };
 
-use crate::global::global::HOLD_ON_TIME;
+// use crate::global::global::HOLD_ON_TIME;
 
 // 缓存扫描码映射，避免重复调用 MapVirtualKeyW
 static SCAN_CODE_CACHE: Lazy<Mutex<std::collections::HashMap<u16, u16>>> =
     Lazy::new(|| Mutex::new(std::collections::HashMap::new()));
 
-pub fn simulate_key(key: u32) -> Result<(), String> {
+pub fn simulate_key(key: u32, key_up_delay: u32) -> Result<(), String> {
     let virtual_key = key as u16;
 
     // 按键按下
     enter_simulate_key(virtual_key, false)?;
 
-    // 按键持续时间
-    let hold_on_time = {
-        let hold_time = HOLD_ON_TIME.lock().map_err(|_| "Failed to acquire lock")?;
-        *hold_time as u64
-    };
+    // // 按键持续时间
+    // let hold_on_time = {
+    //     let hold_time = HOLD_ON_TIME.lock().map_err(|_| "Failed to acquire lock")?;
+    //     *hold_time as u64
+    // };
 
-    if hold_on_time > 0 {
-        thread::sleep(time::Duration::from_millis(hold_on_time));
+    if key_up_delay > 0 {
+        thread::sleep(time::Duration::from_millis(key_up_delay.into()));
     }
 
     // 按键释放

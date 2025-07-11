@@ -34,6 +34,7 @@ interface EdgeData {
 interface Element {
     elements_key: string;
     elements_code: number;
+    key_up_delay?: number; // 可选属性，默认为0
 }
 
 interface Skill {
@@ -161,7 +162,8 @@ const OperateCard = forwardRef(({ operate, onEdit }: Props, ref) => {
             if (data.elements_code !== undefined) {
                 return {
                     elements_key: data.elements_key || label,
-                    elements_code: data.elements_code
+                    elements_code: data.elements_code,
+                    key_up_delay: data.key_up_delay || 0 // 使用默认值0
                 } as Element;
             } else if (data.skill_code !== undefined) {
                 return {
@@ -206,7 +208,8 @@ const OperateCard = forwardRef(({ operate, onEdit }: Props, ref) => {
             // 默认返回Element类型
             return {
                 elements_key: label,
-                elements_code: 0
+                elements_code: 0,
+                key_up_delay: 0
             } as Element;
         };
 
@@ -259,7 +262,8 @@ const OperateCard = forwardRef(({ operate, onEdit }: Props, ref) => {
             // 如果header不是Element类型，创建一个默认的Element
             header = {
                 elements_key: headerNode.label || "",
-                elements_code: 0
+                elements_code: 0,
+                key_up_delay: 0
             };
         }
 

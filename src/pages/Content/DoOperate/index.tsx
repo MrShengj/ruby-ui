@@ -144,9 +144,47 @@ const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initi
 
     const handleModalOk = async () => {
         const data = operateX6Ref.current?.getGraphData?.();
+        if (!data?.nodes || data.nodes.length === 0) {
+            messageApi.error("请添加至少一个节点");
+            return;
+        }
 
-        if (data?.nodes.length === 0 || !data?.nodes[0].data?.elements_code) {
-            messageApi.error("起始必须是按键组件");
+        // 找到起始节点（没有输入边的节点）
+        const findStartNode = () => {
+            if (!data.edges || data.edges.length === 0) {
+                // 如果没有边，返回第一个节点
+                return data.nodes[0];
+            }
+
+            // 获取所有有输入边的节点ID
+            const nodesWithInput = new Set(data.edges.map(edge => edge.target?.cell || edge.target));
+
+            // 找到没有输入边的节点（起始节点）
+            const startNodes = data.nodes.filter(node => !nodesWithInput.has(node.id));
+
+            if (startNodes.length === 0) {
+                // 如果所有节点都有输入边（形成环），返回第一个节点
+                return data.nodes[0];
+            }
+
+            if (startNodes.length > 1) {
+                // 如果有多个起始节点，返回第一个
+                console.warn("检测到多个起始节点，使用第一个:", startNodes);
+            }
+
+            return startNodes[0];
+        };
+
+        const startNode = findStartNode();
+
+        if (!startNode) {
+            messageApi.error("未找到起始节点");
+            return;
+        }
+        // 检查起始节点是否是按键组件
+        if (!startNode.data?.elements_code && !startNode.data?.elements_key) {
+            // console.log("起始节点数据:", startNode);
+            messageApi.error("起始节点必须是按键组件");
             return;
         }
         if (operateName.trim() === "") {
