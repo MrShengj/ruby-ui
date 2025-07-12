@@ -27,9 +27,8 @@ body,
   padding: 0;
   padding-top: 5px;
   scrollbar-width: none; /* 禁止滚动条 */
-  overflow: hidden;      /* 禁止滚动条 */
+  overflow: hidden; /* 禁止滚动条 */
 }
-
 
 /* Chrome/Edge/Safari */
 .contentStyle::-webkit-scrollbar {
@@ -57,7 +56,7 @@ body,
   color: #fff;
   padding: 0 32px;
   line-height: 64px;
-  background: linear-gradient(90deg, #9b111e, #e0115f, #ff4069, #9b111e);
+  /* background: linear-gradient(90deg, #9b111e, #e0115f, #ff4069, #9b111e); */
   background-size: 200% 200%;
   animation: ruby-gradient 6s ease-in-out infinite;
   -webkit-app-region: drag;

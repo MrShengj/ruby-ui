@@ -9,7 +9,7 @@ import {
 } from "@ant-design/icons";
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
-import logo from "../../assets/logo.svg";
+import logo from "../../assets/app-icon.png";
 import { registerUser } from "../../api/system/user";
 
 const HeaderPage = () => {
@@ -93,7 +93,7 @@ const HeaderPage = () => {
       {contextHolder}
       {modalContextHolder}
       <div className="headerContainer" data-tauri-drag-region>
-        <Avatar className="avatar" src={logo} /> {/* 使用 PNG 图像 */}
+        <Avatar className="avatar" src={logo} />
         <div className="uidContainer">
           <p className="uid">{uuid}</p>
         </div>
@@ -101,20 +101,28 @@ const HeaderPage = () => {
           <Button onClick={handleOpenGithub} className="windowButton">
             <Badge
               count=""
-              style={{ backgroundColor: "red", fontSize: 8 }}
-              offset={[5, 0]}
+              style={{
+                backgroundColor: "#00ffff",
+                fontSize: 6,
+                width: 8,
+                height: 8,
+                minWidth: 8,
+                borderRadius: "50%",
+                boxShadow: "0 0 10px #00ffff",
+              }}
+              offset={[8, -8]}
             >
-              <GithubOutlined style={{ color: "white", fontSize: 20 }} />
+              <GithubOutlined style={{ color: "#00ffff", fontSize: 18 }} />
             </Badge>
           </Button>
           <Button
             onClick={handleMinimize}
-            icon={<MinusOutlined style={{ color: "white" }} />}
+            icon={<MinusOutlined style={{ color: "#ffff00", fontSize: 16 }} />}
             className="windowButton"
           />
           <Button
             onClick={handleClose}
-            icon={<CloseOutlined style={{ color: "white" }} />}
+            icon={<CloseOutlined style={{ color: "#ff6666", fontSize: 16 }} />}
             className="windowButton"
           />
         </div>
@@ -129,10 +137,15 @@ const HeaderPage = () => {
               gap: "8px",
               fontSize: "16px",
               fontWeight: 600,
+              background: "linear-gradient(135deg, #1a1a2e, #16213e)",
+              color: "#fff",
+              padding: "12px 16px",
+              borderRadius: "8px 8px 0 0",
+              margin: "-20px -24px 0 -24px",
             }}
           >
             <ExclamationCircleOutlined
-              style={{ color: "#faad14", fontSize: "18px" }}
+              style={{ color: "#ff6666", fontSize: "18px" }}
             />
             关闭应用
           </div>
@@ -147,15 +160,18 @@ const HeaderPage = () => {
         centered
         bodyStyle={{
           padding: "20px 24px",
-          background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+          background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)",
+          color: "#fff",
+          borderRadius: "0 0 8px 8px",
         }}
         okButtonProps={{
           style: {
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            background: "linear-gradient(135deg, #ff0066 0%, #ff3366 100%)",
             border: "none",
             borderRadius: "6px",
             height: "36px",
             fontWeight: 500,
+            boxShadow: "0 4px 15px rgba(255, 0, 100, 0.3)",
           },
         }}
         cancelButtonProps={{
@@ -163,6 +179,9 @@ const HeaderPage = () => {
             borderRadius: "6px",
             height: "36px",
             fontWeight: 500,
+            background: "rgba(255, 255, 255, 0.1)",
+            borderColor: "rgba(255, 255, 255, 0.3)",
+            color: "#fff",
           },
         }}
       >

@@ -4,57 +4,102 @@
   height: 64px;
   width: 100vw;
   -webkit-app-region: drag;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  border-bottom: 2px solid rgba(255, 0, 100, 0.3);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.headerContainer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+      circle at 20% 50%,
+      rgba(255, 0, 100, 0.1) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 50%,
+      rgba(0, 255, 255, 0.1) 0%,
+      transparent 50%
+    );
+  pointer-events: none;
 }
 
 .avatar {
-  /* 可选：如果你希望 Avatar 保持在容器的边缘，添加一些 margin */
-  margin-right: 20px; /* 可选的间距 */
-  width: 40px; /* 调整宽度，放大 Avatar */
-  height: 40px; /* 调整高度，放大 Avatar */
+  margin-left: 16px;
+  margin-right: 20px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(255, 0, 100, 0.4), 0 0 40px rgba(255, 0, 100, 0.2);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.avatar:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 0 30px rgba(255, 0, 100, 0.6), 0 0 60px rgba(255, 0, 100, 0.3);
 }
 
 .p {
-  margin-right: 10px; /* 可选的间距 */
+  margin-right: 10px;
   font-family: "隶书";
   font-size: "16px";
   color: "blue";
 }
 
 .uidContainer {
-  margin-right: auto; /* This ensures the UID is aligned to the right */
+  margin-right: auto;
+  position: relative;
+  z-index: 2;
 }
 
 .uid {
   font-size: 16px;
-  font-weight: bold;
-  background: linear-gradient(
-    270deg,
-    #ff0000,
-    #00ff00,
-    #0000ff
-  ); /* Initial gradient colors */
-  background-size: 200% 200%; /* To make the gradient animate smoothly */
+  font-weight: 600;
+  font-family: "Courier New", monospace;
+  background: linear-gradient(45deg, #ff0066, #00ffff, #9966ff, #ff3366);
+  background-size: 300% 300%;
   background-clip: text;
-  -webkit-background-clip: text; /* For Safari */
+  -webkit-background-clip: text;
   color: transparent;
-  animation: gradientAnimation 5s ease infinite;
+  animation: gradientAnimation 3s ease infinite;
   -webkit-app-region: drag;
-  opacity: 0; /* 初始隐藏 */
-  visibility: hidden; /* 初始隐藏 */
-  transition: opacity 0.3s ease, visibility 0.3s ease; /* 添加过渡效果 */
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  text-shadow: 0 0 10px rgba(255, 0, 100, 0.5);
+  letter-spacing: 1px;
 }
 
 .uidContainer:hover .uid {
-  opacity: 1; /* 悬停时显示 */
-  visibility: visible; /* 悬停时显示 */
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-2px);
 }
 
 @keyframes gradientAnimation {
   0% {
     background-position: 0% 50%;
   }
-  50% {
+  33% {
     background-position: 100% 50%;
+  }
+  66% {
+    background-position: 50% 100%;
   }
   100% {
     background-position: 0% 50%;
@@ -64,23 +109,92 @@
 .rightSection {
   display: flex;
   align-items: center;
+  gap: 8px;
+  margin-right: 16px;
+  position: relative;
+  z-index: 2;
 }
 
 .windowButton {
-  width: 24px; /* 按钮宽度 */
-  height: 24px; /* 按钮高度 */
-  margin-left: 10px;
-  display: flex; /* 使用 Flexbox */
-  align-items: center; /* 垂直居中 */
-  justify-content: center; /* 水平居中 */
-  font-size: 12px; /* 调整字体大小 */
-  background: none;
-  border: none;
+  width: 36px;
+  height: 36px;
+  margin-left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
   cursor: pointer;
   -webkit-app-region: no-drag;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.windowButton::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transition: left 0.6s;
+}
+
+.windowButton:hover::before {
+  left: 100%;
 }
 
 .windowButton:hover {
-  background-color: transparent !important; /* 鼠标悬浮时去掉背景 */
-  transform: scale(1.4); /* 放大 10% */
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 0, 100, 0.5);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 0, 100, 0.3);
+}
+
+.windowButton:active {
+  transform: translateY(0) scale(0.95);
+}
+
+/* GitHub 按钮特殊样式 */
+.windowButton:first-child:hover {
+  border-color: rgba(0, 255, 255, 0.5);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+/* 最小化按钮特殊样式 */
+.windowButton:nth-child(2):hover {
+  border-color: rgba(255, 255, 0, 0.5);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 0, 0.3);
+}
+
+/* 关闭按钮特殊样式 */
+.windowButton:last-child:hover {
+  border-color: rgba(255, 100, 100, 0.5);
+  background: rgba(255, 100, 100, 0.1);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 100, 100, 0.4);
+}
+
+/* 添加整体动画效果 */
+@keyframes headerGlow {
+  0%,
+  100% {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 30px rgba(255, 0, 100, 0.1);
+  }
+}
+
+.headerContainer {
+  animation: headerGlow 8s ease-in-out infinite;
 }
