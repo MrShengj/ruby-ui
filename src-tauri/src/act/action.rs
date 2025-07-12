@@ -17,38 +17,45 @@ use crate::{
     rgb::check::check_color_distance,
 };
 
-fn handle_children(
-    children: Option<Vec<Children>>,
-    target_iyn: &str,
-    stop_flag: &Arc<AtomicBool>,
-) -> Result<(), Box<dyn std::error::Error>> {
+fn collect_children(children: Option<Vec<Children>>, target_iyn: &str) -> Vec<Children> {
+    let mut result = Vec::new();
     if let Some(children) = children {
         for child in children {
             if child.iyn == target_iyn {
-                run_element(vec![child], stop_flag.clone())?;
+                result.push(child);
             }
         }
     }
-    Ok(())
+    result
 }
 
 pub fn run_element(
     elements: Vec<Children>,
     stop_flag: Arc<AtomicBool>,
 ) -> Result<(), Box<dyn std::error::Error>> {
+    let mut next_level: Vec<Children> = Vec::new();
+
     for c in elements {
-        // 更频繁地检查停止标志
         if stop_flag.load(Ordering::Relaxed) {
             return Ok(());
         }
+        // let element_type = match &c.element {
+        //     ElementEnum::Element(_) => "Element",
+        //     ElementEnum::Skill(_) => "Skill",
+        //     ElementEnum::TimeOrNama(_) => "TimeOrNama",
+        //     ElementEnum::Color(_) => "Color",
+        // };
+        // println!(
+        //     "[执行元素] ElementEnum::{:?} - {:?}",
+        //     element_type, c.element
+        // );
+        // let start_time = Instant::now();
 
-        let result = match &c.element {
+        let children_to_add = match &c.element {
             ElementEnum::Element(e) => {
-                // println!("Executing element: {:?}", e);
-                // 添加错误处理
                 simulate_key(e.elements_code, e.key_up_delay)
                     .map_err(|e| format!("Failed to simulate key: {:?}", e))?;
-                handle_children(c.children.clone(), "y", &stop_flag)
+                collect_children(c.children.clone(), "y")
             }
             ElementEnum::Skill(s) => {
                 let process_name = PROCESS_NAME.clone();
@@ -60,36 +67,24 @@ pub fn run_element(
                         });
                         let target_iyn: &'static str =
                             if skill_code == s.skill_code { "y" } else { "n" };
-                        handle_children(c.children.clone(), target_iyn, &stop_flag)
+                        collect_children(c.children.clone(), target_iyn)
                     }
                     Err(e) => {
                         eprintln!("Failed to create GameMemoryReader: {:?}", e);
-                        // 继续执行而不是失败
-                        handle_children(c.children.clone(), "n", &stop_flag)
+                        collect_children(c.children.clone(), "n")
                     }
                 }
             }
             ElementEnum::TimeOrNama(t) => match t.t {
                 1 => {
-                    let sleep_duration = Duration::from_millis(t.n as u64);
-                    let start_time = Instant::now();
-                    // 使用更小的检查间隔以提高响应性
-                    let check_interval = Duration::from_millis(2);
-
-                    while start_time.elapsed() < sleep_duration {
-                        if stop_flag.load(Ordering::Relaxed) {
-                            return Ok(());
-                        }
-                        thread::sleep(check_interval);
-                    }
-                    handle_children(c.children.clone(), "y", &stop_flag)
+                    thread::sleep(Duration::from_millis(t.n as u64));
+                    collect_children(c.children.clone(), "y")
                 }
                 2 => {
                     let e_id = &t.id;
                     let out_wait_time = t.n * 2;
                     let now = Instant::now();
 
-                    // 添加锁超时保护
                     let check_result = match TIME_CHECK_TIME.try_lock() {
                         Ok(mut last_time_map) => {
                             if let Some(last_time) = last_time_map.get(e_id) {
@@ -112,12 +107,12 @@ pub fn run_element(
                             eprintln!(
                                 "Failed to acquire TIME_CHECK_TIME lock, using default value"
                             );
-                            false // 默认值
+                            false
                         }
                     };
 
                     let target_iyn = if check_result { "y" } else { "n" };
-                    handle_children(c.children.clone(), target_iyn, &stop_flag)
+                    collect_children(c.children.clone(), target_iyn)
                 }
                 3 => {
                     let process_name = PROCESS_NAME.clone();
@@ -132,18 +127,17 @@ pub fn run_element(
                             } else {
                                 "n"
                             };
-                            handle_children(c.children.clone(), target_iyn, &stop_flag)
+                            collect_children(c.children.clone(), target_iyn)
                         }
                         Err(e) => {
                             eprintln!("Failed to create GameMemoryReader for mana: {:?}", e);
-                            handle_children(c.children.clone(), "n", &stop_flag)
+                            collect_children(c.children.clone(), "n")
                         }
                     }
                 }
-                _ => Ok(()),
+                _ => Vec::new(),
             },
             ElementEnum::Color(co) => {
-                // 为颜色检查添加错误处理
                 let check_result = match std::panic::catch_unwind(|| {
                     check_color_distance(co.rgb.clone(), co.coordinate.clone(), 0)
                 }) {
@@ -154,20 +148,25 @@ pub fn run_element(
                     }
                 };
                 let target_iyn = if check_result { "y" } else { "n" };
-                handle_children(c.children.clone(), target_iyn, &stop_flag)
+                collect_children(c.children.clone(), target_iyn)
             }
         };
 
-        // 处理子元素执行的错误
-        if let Err(e) = result {
-            eprintln!("Error handling children: {:?}", e);
-            // 继续执行下一个元素而不是终止整个流程
-        }
+        // let elapsed = start_time.elapsed();
+        // println!(
+        //     "[耗时统计] ElementEnum::{:?} 执行耗时: {:?}",
+        //     element_type, elapsed
+        // );
 
-        // 在每个元素处理完后再次检查停止标志
+        next_level.extend(children_to_add);
+
         if stop_flag.load(Ordering::Relaxed) {
             return Ok(());
         }
+    }
+
+    if !next_level.is_empty() {
+        run_element(next_level, stop_flag)?;
     }
     Ok(())
 }

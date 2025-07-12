@@ -72,7 +72,7 @@ fn hold_on(elements: Elements) {
                                 }
                                 // let execution_time = start_time.elapsed();
                                 // cycle_count += 1;
-                                // println!("run_element cycle {}: {:?}", cycle_count, execution_time);
+                                // println!("run_element cycle {:?}", execution_time);
                             }
                             // 检查是否需要停止
                             if stop_flag.load(Ordering::Relaxed) {
