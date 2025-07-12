@@ -47,8 +47,14 @@ const Panel = () => {
             setHoldOn(hdo);
         };
 
+        const getActionType = async () => {
+            const actionType = await window.sessionStorage.getItem("actionType");
+            setActionTypeValue(Number(actionType) || 1);
+        };
+
         fetchVersion();
         fetchHoldOn();
+        getActionType();
     }, []);
 
     listen("stop_action", (event: any) => {
@@ -68,6 +74,7 @@ const Panel = () => {
     const action_type = async (event) => {
         const newValue = event.target.value;
         setActionTypeValue(newValue);
+        window.sessionStorage.setItem("actionType", newValue);
         await invoke("change_action_type", { t: newValue });
 
         // 模式切换时，触发自定义事件通知OperateCard重新启动
