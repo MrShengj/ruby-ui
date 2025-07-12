@@ -93,7 +93,10 @@ fn hold_on(elements: Elements) {
                             return;
                         }
                         if let Some(children) = &elements_c.children {
-                            run_element(children.clone(), stop_flag.clone());
+                            let result = run_element(children.clone(), stop_flag.clone());
+                            if result.is_err() {
+                                eprintln!("Error running element: {:?}", result.err());
+                            }
                         }
                     }));
                 }
@@ -199,7 +202,10 @@ fn click(elements: Elements) {
                     worker = Some(thread::spawn(move || {
                         while !stop_flag.load(Ordering::Relaxed) {
                             if let Some(children) = &elements_c.children {
-                                run_element(children.clone(), stop_flag.clone());
+                                let result = run_element(children.clone(), stop_flag.clone());
+                                if result.is_err() {
+                                    eprintln!("Error running element: {:?}", result.err());
+                                }
                             }
                             // 控制循环频率
                             thread::sleep(Duration::from_millis(*TIME_WITE));

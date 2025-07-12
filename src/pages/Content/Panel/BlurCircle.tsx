@@ -59,9 +59,9 @@ const BlurCircle = forwardRef<BlurCircleRef, BlurCircleProps>((props, ref) => {
           <div className="blur-circle__content">{children}</div>
         )}
       </div>
-      <div className="blur-circle__status-text">
+      {/* <div className="blur-circle__status-text">
         {isActive ? "活跃状态" : "待机状态"}
-      </div>
+      </div> */}
     </div>
   );
 });

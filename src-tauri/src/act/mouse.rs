@@ -66,7 +66,10 @@ fn hold_on(elements: Elements) {
                         while !stop_flag.load(Ordering::Relaxed) {
                             if let Some(children) = &elements_c.children {
                                 // let start_time = Instant::now();
-                                run_element(children.clone(), stop_flag.clone());
+                                let result = run_element(children.clone(), stop_flag.clone());
+                                if result.is_err() {
+                                    eprintln!("Error running element: {:?}", result.err());
+                                }
                                 // let execution_time = start_time.elapsed();
                                 // cycle_count += 1;
                                 // println!("run_element cycle {}: {:?}", cycle_count, execution_time);
@@ -138,7 +141,10 @@ fn click(elements: Elements) {
                     worker = Some(thread::spawn(move || {
                         while !stop_flag.load(Ordering::Relaxed) {
                             if let Some(children) = &elements_c.children {
-                                run_element(children.clone(), stop_flag.clone());
+                                let result = run_element(children.clone(), stop_flag.clone());
+                                if result.is_err() {
+                                    eprintln!("Error running element: {:?}", result.err());
+                                }
                             }
                             // 移除 TIME_WITE 等待，让 run_element 连续执行
                         }

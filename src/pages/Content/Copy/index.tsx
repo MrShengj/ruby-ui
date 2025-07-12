@@ -194,6 +194,7 @@ const Copy: React.FC<CopyProps> = ({ open, onClose }) => {
                                 ) : (
                                     <List
                                         dataSource={operateList}
+                                        grid={{ gutter: 16, column: 2 }}
                                         renderItem={(item) => (
                                             <List.Item key={item.id} className="list-item">
                                                 <Card className="operate-card" hoverable>
@@ -201,7 +202,7 @@ const Copy: React.FC<CopyProps> = ({ open, onClose }) => {
                                                         <div className="card-header">
                                                             <Avatar
                                                                 size={40}
-                                                                src={item.operate_icon || '/new.svg'} // 使用默认图标或传入的图标
+                                                                src={item.operate_icon || '/new.svg'}
                                                                 className="operate-avatar"
                                                             />
                                                             <div className="operate-info">

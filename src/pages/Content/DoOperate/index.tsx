@@ -98,8 +98,6 @@ const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initi
     }, []);
 
     useEffect(() => {
-
-
         // 如果是编辑模式，初始化数据
         if (isEdit && initialNodes && initialEdges && initialOperateName) {
             // 处理边数据，确保解析连接点信息
@@ -204,15 +202,14 @@ const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initi
             operate_icon: selectedIcon, // 使用当前选择的图标
             user_id: Number(user_id),
         };
-
         if (isEdit && operateId) {
             operate.id = operateId;
         }
 
         try {
             let res;
+            console.log("操作数据:", operate);
             if (isEdit) {
-                console.log("编辑操作数据:", operate);
                 res = await updateOperate(operate);
             } else {
                 res = await createOperate(operate);

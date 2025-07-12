@@ -142,6 +142,7 @@ const HeaderPage = () => {
               padding: "12px 16px",
               borderRadius: "8px 8px 0 0",
               margin: "-20px -24px 0 -24px",
+              borderBottom: "1px solid rgba(255, 0, 100, 0.3)",
             }}
           >
             <ExclamationCircleOutlined
@@ -162,7 +163,7 @@ const HeaderPage = () => {
           padding: "20px 24px",
           background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)",
           color: "#fff",
-          borderRadius: "0 0 8px 8px",
+          borderRadius: "8px 8px 8px 8px",
         }}
         okButtonProps={{
           style: {
@@ -172,6 +173,7 @@ const HeaderPage = () => {
             height: "36px",
             fontWeight: 500,
             boxShadow: "0 4px 15px rgba(255, 0, 100, 0.3)",
+            color: "#fff",
           },
         }}
         cancelButtonProps={{
@@ -184,11 +186,35 @@ const HeaderPage = () => {
             color: "#fff",
           },
         }}
+        styles={{
+          mask: {
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            backdropFilter: "blur(4px)",
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: "100vw",
+            height: "100vh",
+            zIndex: 1000,
+          },
+          wrapper: {
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: "100vw",
+            height: "100vh",
+            zIndex: 1000,
+          },
+        }}
       >
         <div
           style={{
             marginBottom: "16px",
-            color: "#666",
+            color: "#ccc",
             fontSize: "14px",
           }}
         >
@@ -202,16 +228,17 @@ const HeaderPage = () => {
           <div
             style={{
               padding: "12px 16px",
-              border: "2px solid #e8e8e8",
+              border: "2px solid rgba(255, 255, 255, 0.1)",
               borderRadius: "8px",
               marginBottom: "12px",
               background:
                 closeOption === 1
-                  ? "linear-gradient(135deg, #667eea20, #764ba220)"
-                  : "#fff",
-              borderColor: closeOption === 1 ? "#667eea" : "#e8e8e8",
+                  ? "linear-gradient(135deg, rgba(255, 0, 100, 0.1), rgba(255, 51, 102, 0.1))"
+                  : "rgba(255, 255, 255, 0.05)",
+              borderColor: closeOption === 1 ? "rgba(255, 0, 100, 0.5)" : "rgba(255, 255, 255, 0.1)",
               transition: "all 0.3s ease",
               cursor: "pointer",
+              backdropFilter: "blur(10px)",
             }}
           >
             <Radio
@@ -220,6 +247,7 @@ const HeaderPage = () => {
                 width: "100%",
                 fontSize: "14px",
                 fontWeight: 500,
+                color: "#fff",
               }}
             >
               <div
@@ -229,7 +257,7 @@ const HeaderPage = () => {
                   marginLeft: "8px",
                 }}
               >
-                <span style={{ color: "#333" }}>退出程序</span>
+                <span style={{ color: "#fff", fontWeight: 500 }}>退出程序</span>
                 <span
                   style={{
                     fontSize: "12px",
@@ -246,15 +274,16 @@ const HeaderPage = () => {
           <div
             style={{
               padding: "12px 16px",
-              border: "2px solid #e8e8e8",
+              border: "2px solid rgba(255, 255, 255, 0.1)",
               borderRadius: "8px",
               background:
                 closeOption === 2
-                  ? "linear-gradient(135deg, #667eea20, #764ba220)"
-                  : "#fff",
-              borderColor: closeOption === 2 ? "#667eea" : "#e8e8e8",
+                  ? "linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(102, 102, 255, 0.1))"
+                  : "rgba(255, 255, 255, 0.05)",
+              borderColor: closeOption === 2 ? "rgba(0, 255, 255, 0.5)" : "rgba(255, 255, 255, 0.1)",
               transition: "all 0.3s ease",
               cursor: "pointer",
+              backdropFilter: "blur(10px)",
             }}
           >
             <Radio
@@ -263,6 +292,7 @@ const HeaderPage = () => {
                 width: "100%",
                 fontSize: "14px",
                 fontWeight: 500,
+                color: "#fff",
               }}
             >
               <div
@@ -272,7 +302,7 @@ const HeaderPage = () => {
                   marginLeft: "8px",
                 }}
               >
-                <span style={{ color: "#333" }}>最小化到托盘</span>
+                <span style={{ color: "#fff", fontWeight: 500 }}>最小化到托盘</span>
                 <span
                   style={{
                     fontSize: "12px",
