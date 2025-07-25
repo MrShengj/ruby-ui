@@ -17,11 +17,24 @@ export const TimeOrNamaLabel = (label: string) => {
     switch (label) {
         case "延迟":
             return 1;
-        case "等待":
+        case "定时":
             return 2;
         case "内力":
             return 3;
+        case "重置定时":
+            return 4;
         default:
             return 0;
     }
 }
+
+// 8位置随机字符生成
+export const generateRandomId = (length: number = 8): string => {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        result += characters[randomIndex];
+    }
+    return result;
+};

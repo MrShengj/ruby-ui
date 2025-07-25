@@ -7,53 +7,27 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import { Graph, Shape } from "@antv/x6";
+import { Graph } from "@antv/x6";
 import { Snapline } from "@antv/x6-plugin-snapline";
 import { Stencil } from "@antv/x6-plugin-stencil";
-import { message, Modal, Input, InputNumber } from "antd";
-import { invoke } from "@tauri-apps/api/core";
+import { message, Modal, Input, InputNumber, Select } from "antd";
 import { createUserRGB, deleteUserRGB } from "../../api/element";
-import { TimeOrNamaLabel } from "../../utils/common";
+import { generateRandomId, TimeOrNamaLabel } from "../../utils/common";
 import "./OperateX6.css";
 import "@antv/x6/dist/index.css";
 import "@antv/x6-plugin-stencil/dist/index.css";
 
-interface NodeData {
-  id?: string;
-  shape?: string;
-  x: number;
-  y: number;
-  width?: number;
-  height?: number;
-  label?: string;
-  attrs?: any;
-  data?: any;
-}
-
-interface EdgeData {
-  id?: string;
-  source: string;
-  target: string;
-  sourcePort?: string;
-  targetPort?: string;
-  label?: string;
-  attrs?: any;
-}
-
-interface OperateX6Props {
-  nodes?: NodeData[];
-  edges?: EdgeData[];
-  rgbs?: any[];
-  elements?: any[];
-  skills?: any[];
-  onChange?: (nodes: NodeData[], edges: EdgeData[]) => void;
-}
-
-interface ColorSaveData {
-  coordinate: string;
-  rgb: string;
-  hex: string;
-}
+// 导入拆分的模块
+import { NodeData, EdgeData, OperateX6Props, ColorSaveData, TimerData } from "./types";
+import { createPortsConfig } from "./config";
+import {
+  createElementComponents,
+  createSkillComponents,
+  createColorComponents,
+  createTimeWaitComponents,
+} from "./componentFactory";
+import { createContextMenuItems } from "./contextMenu";
+import { createGraphConfig } from "./graphConfig";
 
 const OperateX6 = forwardRef<any, OperateX6Props>(
   (
@@ -73,84 +47,16 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
     const [editingNode, setEditingNode] = useState<any>(null);
     const [saveColorModalVisible, setSaveColorModalVisible] = useState(false);
     const [colorName, setColorName] = useState("");
-    const [savingColorData, setSavingColorData] =
-      useState<ColorSaveData | null>(null);
+    const [savingColorData, setSavingColorData] = useState<ColorSaveData | null>(null);
+    const [timerModalVisible, setTimerModalVisible] = useState(false);
+    const [timerName, setTimerName] = useState("");
+    const [timerTime, setTimerTime] = useState<number>(0);
+    const [resetTimerModalVisible, setResetTimerModalVisible] = useState(false);
+    const [selectedTimerName, setSelectedTimerName] = useState("");
+    const [timers, setTimers] = useState<TimerData[]>([]);
 
     // 端口配置
-    const portsConfig = useMemo(() => {
-      const baseGroups = {
-        top: {
-          position: "top",
-          attrs: {
-            circle: {
-              r: 6,
-              magnet: true,
-              stroke: "#1890ff",
-              strokeWidth: 2,
-              fill: "#1890ff",
-            },
-          },
-        },
-        bottom: {
-          position: "bottom",
-          attrs: {
-            circle: {
-              r: 6,
-              magnet: true,
-              stroke: "#52c41a",
-              strokeWidth: 2,
-              fill: "#52c41a",
-            },
-          },
-        },
-        bottomGreen: {
-          position: { name: "bottom", args: { dx: 15 } },
-          attrs: {
-            circle: {
-              r: 6,
-              magnet: true,
-              stroke: "#52c41a",
-              strokeWidth: 2,
-              fill: "#52c41a",
-            },
-          },
-        },
-        bottomRed: {
-          position: { name: "bottom", args: { dx: -15 } },
-          attrs: {
-            circle: {
-              r: 6,
-              magnet: true,
-              stroke: "#ff4d4f",
-              strokeWidth: 2,
-              fill: "#ff4d4f",
-            },
-          },
-        },
-      };
-
-      return {
-        normal: {
-          groups: baseGroups,
-          items: [
-            { id: "i", group: "top" },
-            { id: "y", group: "bottomGreen" },
-            { id: "n", group: "bottomRed" },
-          ],
-        },
-        singleY: {
-          groups: baseGroups,
-          items: [{ id: "y", group: "bottom" }],
-        },
-        delay: {
-          groups: baseGroups,
-          items: [
-            { id: "i", group: "top" },
-            { id: "y", group: "bottom" },
-          ],
-        },
-      };
-    }, []);
+    const portsConfig = useMemo(() => createPortsConfig(), []);
 
     // API 调用
     const saveUserRGB = useCallback(
@@ -163,7 +69,6 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
 
         const data = { user_id: parseInt(user_id), coordinate, rgb, name };
         const res = await createUserRGB(data);
-        // 保存下res.data.id的数据
 
         if (res.code === 200) {
           rgbs.push({
@@ -192,9 +97,24 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
       [messageApi]
     );
 
-    const mouseRgb = useCallback(async (): Promise<string[]> => {
-      const now_mouse_rgb: string = await invoke("get_mouse_rgb");
-      return now_mouse_rgb.split("|");
+    // 获取所有定时器名称
+    const getTimerNames = useCallback(() => {
+      if (!graphRef.current) return [];
+
+      const nodes = graphRef.current.getNodes();
+      const timerNodes = nodes.filter(node => {
+        const nodeData = node.getData();
+        return nodeData?.id && nodeData?.n;
+      });
+
+      return timerNodes.map(node => {
+        const nodeData = node.getData();
+        return {
+          id: nodeData.id,
+          name: nodeData.name,
+          n: nodeData.n
+        };
+      });
     }, []);
 
     // 变化触发器
@@ -225,374 +145,59 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
       }));
 
       onChange(nodes, edges);
-    }, [onChange]);
+      setTimers(getTimerNames());
+    }, [onChange, getTimerNames]);
 
-    // 创建组件的工厂函数
-    const createElementComponents = useCallback(
-      (elements: any[]) => {
-        return elements.map((element) => {
-          const isSpecialType =
-            element.elements_code === 4 || element.elements_code === 5;
-          const labelColor = isSpecialType ? "#003a8c" : "#1890ff";
-          const ports = isSpecialType ? portsConfig.singleY : portsConfig.delay;
-
-          return new Shape.Rect({
-            width: 80,
-            height: 36,
-            attrs: {
-              body: { fill: "#fffbe6", stroke: labelColor, rx: 8, ry: 8 },
-              label: {
-                text: element.elements_key || "按键",
-                fill: labelColor,
-                fontSize: 14,
-              },
-            },
-            ports,
-            data: {
-              elements_code: element.elements_code,
-              elements_key: element.elements_key,
-              key_up_delay: 0, // 默认按键弹起延迟为0
-            },
-          });
-        });
-      },
-      [portsConfig]
-    );
-
-    const createSkillComponents = useCallback(
-      (skills: any[]) => {
-        return skills.map(
-          (skill) =>
-            new Shape.Rect({
-              width: 80,
-              height: 36,
-              attrs: {
-                body: { fill: "#e6fffb", stroke: "#13c2c2", rx: 8, ry: 8 },
-                label: {
-                  text: skill.skill_name || "技能",
-                  fill: "#13c2c2",
-                  fontSize: 14,
-                },
-              },
-              ports: portsConfig.normal,
-              data: {
-                skill_name: skill.skill_name,
-                skill_code: skill.skill_code,
-              },
-            })
-        );
-      },
-      [portsConfig.normal]
-    );
-
-    const createColorComponents = useCallback(
-      (rgbs: any[]) => {
-        const components = [
-          new Shape.Rect({
-            width: 80,
-            height: 36,
-            attrs: {
-              body: { fill: "#f0f5ff", stroke: "#2f54eb", rx: 8, ry: 8 },
-              label: { text: "取色", fill: "#2f54eb", fontSize: 14 },
-            },
-            ports: portsConfig.normal,
-          }),
-        ];
-
-        rgbs.forEach((color) => {
-          const rgb = color.rgb.split(",").map(Number);
-          const hex = `#${rgb
-            .map((x) => x.toString(16).padStart(2, "0"))
-            .join("")}`;
-
-          components.push(
-            new Shape.Rect({
-              width: 80,
-              height: 36,
-              attrs: {
-                body: { fill: hex, stroke: "#2f54eb", rx: 8, ry: 8 },
-                label: { text: color.name, fill: "#2f54eb", fontSize: 14 },
-              },
-              ports: portsConfig.normal,
-              data: {
-                id: color.id,
-                coordinate: color.coordinate,
-                rgb: color.rgb,
-              },
-            })
-          );
-        });
-
-        return components;
-      },
-      [portsConfig.normal]
-    );
-
-    const createTimeWaitComponents = useCallback(() => {
-      return [
-        new Shape.Rect({
-          width: 80,
-          height: 36,
-          attrs: {
-            body: { fill: "#fff1f0", stroke: "#ff4d4f", rx: 8, ry: 8 },
-            label: { text: "延迟", fill: "#ff4d4f", fontSize: 14 },
-          },
-          ports: portsConfig.delay,
-        }),
-        new Shape.Rect({
-          width: 80,
-          height: 36,
-          attrs: {
-            body: { fill: "#fff1f0", stroke: "#ff4d4f", rx: 8, ry: 8 },
-            label: { text: "等待", fill: "#ff4d4f", fontSize: 14 },
-          },
-          ports: portsConfig.normal,
-        }),
-        new Shape.Rect({
-          width: 80,
-          height: 36,
-          attrs: {
-            body: { fill: "#fff1f0", stroke: "#00a2c2", rx: 8, ry: 8 },
-            label: { text: "内力", fill: "#00a2c2", fontSize: 14 },
-          },
-          ports: portsConfig.normal,
-        }),
-      ];
-    }, [portsConfig]);
-
-    // 刷新颜色组件
+    // 刷新组件函数
     const refreshColorComponents = useCallback(() => {
       if (!graphRef.current?.stencil) return;
 
       const stencil = graphRef.current.stencil;
-
-      // 检查 stencil 是否已经完全初始化
       if (!stencil.graphs || !stencil.graphs.colors) return;
 
-      const colorComponents = createColorComponents(rgbs);
+      const colorComponents = createColorComponents(rgbs, portsConfig);
 
       try {
         stencil.unload("colors");
         stencil.load(colorComponents, "colors");
       } catch (error) {
-        // console.warn("刷新颜色组件时出错:", error);
-        // 如果 unload 失败，直接重新加载
         stencil.load(colorComponents, "colors");
       }
-    }, [rgbs, createColorComponents]);
+    }, [rgbs, portsConfig]);
 
-    // 刷新按键组件
     const refreshElementComponents = useCallback(() => {
       if (!graphRef.current?.stencil) return;
 
       const stencil = graphRef.current.stencil;
-
-      // 检查 stencil 是否已经完全初始化
       if (!stencil.graphs || !stencil.graphs.elements) return;
 
-      const elementComponents = createElementComponents(elements);
+      const elementComponents = createElementComponents(elements, portsConfig);
 
       try {
         stencil.unload("elements");
         stencil.load(elementComponents, "elements");
       } catch (error) {
-        // 如果 unload 失败，直接重新加载
         stencil.load(elementComponents, "elements");
       }
-    }, [elements, createElementComponents]);
+    }, [elements, portsConfig]);
 
-    // 刷新技能组件
     const refreshSkillComponents = useCallback(() => {
       if (!graphRef.current?.stencil) return;
 
       const stencil = graphRef.current.stencil;
-
-      // 检查 stencil 是否已经完全初始化
       if (!stencil.graphs || !stencil.graphs.skills) return;
 
-      const skillComponents = createSkillComponents(skills);
+      const skillComponents = createSkillComponents(skills, portsConfig);
 
       try {
         stencil.unload("skills");
         stencil.load(skillComponents, "skills");
       } catch (error) {
-        // 如果 unload 失败，直接重新加载
         stencil.load(skillComponents, "skills");
       }
-    }, [skills, createSkillComponents]);
+    }, [skills, portsConfig]);
 
     // 右键菜单处理
-    const createContextMenuItems = useCallback(
-      (node: any, menu: HTMLElement) => {
-        const label = node.attr("label/text");
-        const nodeData = node.getData();
-
-        // 按键组件的菜单 - 添加这个新的部分
-        if (nodeData?.elements_code || nodeData?.elements_key) {
-          const delayBtn = document.createElement("div");
-          delayBtn.className = "x6-context-menu-item";
-          delayBtn.innerText = "弹起延迟";
-          delayBtn.onclick = () => {
-            setModalLabel("弹起延迟");
-            const existingDelay = nodeData?.key_up_delay || 0;
-            setModalValue(existingDelay);
-            setEditingNode(node);
-            setModalVisible(true);
-            menu.remove();
-          };
-          menu.appendChild(delayBtn);
-        }
-
-        // 取色相关菜单
-        if (label === "取色" || nodeData?.rgb) {
-          const colorBtn = document.createElement("div");
-          colorBtn.className = "x6-context-menu-item";
-          colorBtn.innerText = "取色";
-          colorBtn.onclick = async () => {
-            try {
-              const [coordinate, rgb] = await mouseRgb();
-              const rgbArray = rgb.split(",").map(Number);
-              const hex = `#${rgbArray
-                .map((x) => x.toString(16).padStart(2, "0"))
-                .join("")}`;
-
-              node.attr("body/fill", hex);
-              node.setData({ coordinate, rgb });
-              messageApi.success("取色成功");
-            } catch (err) {
-              messageApi.error("取色失败");
-            }
-            menu.remove();
-          };
-          menu.appendChild(colorBtn);
-
-          // 保存按钮
-          const saveBtn = document.createElement("div");
-          saveBtn.className = "x6-context-menu-item";
-          saveBtn.innerText = "保存";
-          saveBtn.onclick = () => {
-            const nodeData = node.getData();
-            if (nodeData?.coordinate && nodeData?.rgb) {
-              setSavingColorData({
-                coordinate: nodeData.coordinate,
-                rgb: nodeData.rgb,
-                hex: node.attr("body/fill"),
-              });
-              setSaveColorModalVisible(true);
-            } else {
-              messageApi.warning("请先取色后再保存");
-            }
-            menu.remove();
-          };
-          menu.appendChild(saveBtn);
-
-          // 永久删除按钮
-          if (nodeData?.id) {
-            const deleteBtn = document.createElement("div");
-            deleteBtn.className = "x6-context-menu-item";
-            deleteBtn.innerText = "永久删除";
-            deleteBtn.style.color = "#ff4d4f";
-            deleteBtn.onclick = () => {
-              modal.confirm({
-                title: "确认删除",
-                content: "确定要永久删除这个取色组件吗？此操作不可撤销。",
-                okText: "确定",
-                cancelText: "取消",
-                okType: "danger",
-                onOk: async () => {
-                  try {
-                    await deleteUserRGBApi(nodeData.id);
-                    node.remove();
-                    // 删除rgbs中的对应数据
-                    const index = rgbs.findIndex(
-                      (color) => color.id === nodeData.id
-                    );
-                    if (index !== -1) {
-                      rgbs.splice(index, 1);
-                    }
-                    triggerChange();
-
-                    // 刷新组件库
-                    setTimeout(() => {
-                      refreshColorComponents();
-                    }, 100);
-                  } catch (error) {
-                    messageApi.error("删除失败");
-                  }
-                },
-              });
-              menu.remove();
-            };
-            menu.appendChild(deleteBtn);
-          }
-        }
-
-        // 时间设置菜单
-        if (
-          label &&
-          (label.startsWith("等待") ||
-            label.startsWith("延迟") ||
-            label.startsWith("内力"))
-        ) {
-          const setBtn = document.createElement("div");
-          setBtn.className = "x6-context-menu-item";
-
-          let type = "延迟";
-          if (label.startsWith("内力")) {
-            type = "内力";
-            setBtn.innerText = "设置内力";
-          } else if (label.startsWith("等待")) {
-            type = "等待";
-            setBtn.innerText = "设置等待";
-          } else {
-            setBtn.innerText = "设置延迟";
-          }
-
-          setBtn.onclick = () => {
-            setModalLabel(type);
-            const nodeData = node.getData();
-            const existingValue =
-              nodeData?.n ||
-              (label.match(/\d+/)?.[0]
-                ? parseInt(label.match(/\d+/)[0])
-                : null) ||
-              0;
-            setModalValue(existingValue);
-            setEditingNode(node);
-            setModalVisible(true);
-            menu.remove();
-          };
-          menu.appendChild(setBtn);
-        }
-
-        // 删除按钮
-        const delBtn = document.createElement("div");
-        delBtn.className = "x6-context-menu-item";
-        delBtn.innerText = "删除";
-        delBtn.onclick = () => {
-          node.remove();
-          menu.remove();
-          triggerChange();
-        };
-        menu.appendChild(delBtn);
-
-        // 取消按钮
-        const cancelBtn = document.createElement("div");
-        cancelBtn.className = "x6-context-menu-item";
-        cancelBtn.innerText = "取消";
-        cancelBtn.onclick = () => menu.remove();
-        menu.appendChild(cancelBtn);
-      },
-      [
-        messageApi,
-        modal,
-        deleteUserRGBApi,
-        triggerChange,
-        mouseRgb,
-        refreshColorComponents,
-      ]
-    );
-
     const handleNodeContextMenu = useCallback(
       ({ e, node }) => {
         e.preventDefault();
@@ -605,7 +210,28 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
         menu.style.top = `${e.clientY}px`;
         menu.style.left = `${e.clientX}px`;
 
-        createContextMenuItems(node, menu);
+        const handlers = {
+          setModalVisible,
+          setModalLabel,
+          setModalValue,
+          setEditingNode,
+          setTimerModalVisible,
+          setTimerName,
+          setTimerTime,
+          setResetTimerModalVisible,
+          setSelectedTimerName,
+          setTimers,
+          setSaveColorModalVisible,
+          setSavingColorData,
+          messageApi,
+          modal,
+          deleteUserRGBApi,
+          triggerChange,
+          refreshColorComponents,
+          getTimerNames,
+        };
+
+        createContextMenuItems(node, menu, handlers);
         document.body.appendChild(menu);
 
         const handleClick = () => {
@@ -614,7 +240,26 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
         };
         setTimeout(() => document.addEventListener("click", handleClick), 0);
       },
-      [createContextMenuItems]
+      [
+        setModalVisible,
+        setModalLabel,
+        setModalValue,
+        setEditingNode,
+        setTimerModalVisible,
+        setTimerName,
+        setTimerTime,
+        setResetTimerModalVisible,
+        setSelectedTimerName,
+        setTimers,
+        setSaveColorModalVisible,
+        setSavingColorData,
+        messageApi,
+        modal,
+        deleteUserRGBApi,
+        triggerChange,
+        refreshColorComponents,
+        getTimerNames,
+      ]
     );
 
     const handleEdgeContextMenu = useCallback(
@@ -660,23 +305,20 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
     const handleTimeEdit = useCallback(() => {
       if (editingNode && modalValue !== null) {
         if (modalLabel === "弹起延迟") {
-          // 处理弹起延迟设置
           const currentData = editingNode.getData();
           editingNode.setData({
             ...currentData,
             key_up_delay: modalValue,
           });
 
-          // 更新节点显示，可以在按键文本后添加延迟标识
           const currentLabel = editingNode.attr("label/text");
-          const baseLabel = currentLabel.replace(/ \(\d+ms\)$/, ""); // 移除之前的延迟标识
+          const baseLabel = currentLabel.replace(/ \(\d+ms\)$/, "");
           const newLabel =
             modalValue > 0 ? `${baseLabel} (${modalValue}ms)` : baseLabel;
           editingNode.attr("label/text", newLabel);
 
           messageApi.success(`按键弹起延迟设置为 ${modalValue}ms`);
         } else {
-          // 处理其他时间设置
           const labelText =
             modalLabel === "内力"
               ? `${modalLabel} <= ${modalValue}`
@@ -693,6 +335,50 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
       setModalVisible(false);
     }, [editingNode, modalValue, modalLabel, triggerChange, messageApi]);
 
+    const handleTimerSetting = useCallback(() => {
+      if (editingNode && timerName.trim() && timerTime > 0) {
+        const labelText = `${timerName.trim()}(${timerTime}ms)`;
+        editingNode.attr("label/text", labelText);
+        editingNode.setData({
+          t: TimeOrNamaLabel("定时"),
+          n: timerTime,
+          name: timerName.trim(),
+          id: generateRandomId(),
+        });
+
+        messageApi.success(`定时器 "${timerName.trim()}" 设置成功，时间: ${timerTime}ms`);
+        triggerChange();
+      } else {
+        messageApi.warning("请填写定时名称和时间");
+      }
+      setTimerModalVisible(false);
+      setTimerName("");
+      setTimerTime(0);
+      setEditingNode(null);
+    }, [editingNode, timerName, timerTime, triggerChange, messageApi]);
+
+    const handleResetTimerSetting = useCallback(() => {
+      if (editingNode && selectedTimerName) {
+        const selectedTimer = timers.find(timer => timer.name === selectedTimerName);
+
+        const labelText = `重置定时: ${selectedTimerName}`;
+        editingNode.attr("label/text", labelText);
+        editingNode.setData({
+          t: TimeOrNamaLabel("重置定时"),
+          id: selectedTimer?.id || selectedTimerName,
+          name: selectedTimerName,
+        });
+
+        messageApi.success(`重置定时器设置成功，目标: ${selectedTimerName}`);
+        triggerChange();
+      } else {
+        messageApi.warning("请选择要重置的定时器");
+      }
+      setResetTimerModalVisible(false);
+      setSelectedTimerName("");
+      setEditingNode(null);
+    }, [editingNode, selectedTimerName, timers, triggerChange, messageApi]);
+
     const handleSaveColor = useCallback(async () => {
       if (savingColorData && colorName.trim()) {
         try {
@@ -705,7 +391,6 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
           setColorName("");
           setSavingColorData(null);
           triggerChange();
-          // 刷新组件库
           setTimeout(() => {
             refreshColorComponents();
           }, 100);
@@ -764,187 +449,7 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
     useEffect(() => {
       if (!containerRef.current || !stencilRef.current) return;
 
-      const graph = new Graph({
-        container: containerRef.current,
-        width: 800,
-        height: 800,
-        grid: true,
-        background: { color: "#f7f9fb" },
-        selecting: false,
-        interacting: { nodeMovable: true, edgeMovable: false },
-        panning: true,
-        mousewheel: {
-          enabled: true,
-          zoomAtMousePosition: true,
-          modifiers: "ctrl",
-          minScale: 0.5,
-          maxScale: 3,
-        },
-        connecting: {
-          // 使用曼哈顿路由，自动避开节点
-          router: {
-            name: "manhattan",
-            args: {
-              padding: 1,
-            },
-          },
-          // 使用圆角连接器，让连线更美观
-          connector: {
-            name: "rounded",
-            args: {
-              radius: 10,
-            },
-          },
-          // 连接点配置
-          anchor: "center",
-          connectionPoint: "anchor",
-          allowBlank: false,
-          allowLoop: false,
-          allowNode: false,
-          allowEdge: false,
-          allowPort: true,
-          highlight: true,
-          // 磁吸配置
-          snap: {
-            radius: 20,
-          },
-          // 自定义连线创建
-          createEdge() {
-            return new Shape.Edge({
-              attrs: {
-                line: {
-                  stroke: "#5F95FF",
-                  strokeWidth: 2,
-                  targetMarker: null,
-                  sourceMarker: null,
-                  // targetMarker: {
-                  //     name: 'ellipse',
-                  //     width: 8,
-                  //     height: 8,
-                  //     fill: '#5F95FF',
-                  //     stroke: '#5F95FF',
-                  //     strokeWidth: 1,
-                  //     rx: 4,
-                  //     ry: 4,
-                  // },
-                  // 或者使用自定义的圆润箭头
-                  // targetMarker: {
-                  //     tagName: 'path',
-                  //     fill: '#5F95FF',
-                  //     stroke: '#5F95FF',
-                  //     strokeWidth: 1,
-                  //     d: 'M 0 0 Q 5 1.5 10 3 Q 5 4.5 0 6 Q 3 3 0 0 Z',
-                  // },
-                  // 添加连线动画效果
-                  strokeDasharray: 0,
-                  style: {
-                    animation: "ant-line 30s infinite linear",
-                  },
-                },
-              },
-              zIndex: 0,
-              // 添加连线标签样式
-              defaultLabel: {
-                markup: [
-                  {
-                    tagName: "rect",
-                    selector: "body",
-                  },
-                  {
-                    tagName: "text",
-                    selector: "label",
-                  },
-                ],
-                attrs: {
-                  label: {
-                    fill: "#5F95FF",
-                    fontSize: 12,
-                    textAnchor: "middle",
-                    textVerticalAnchor: "middle",
-                    pointerEvents: "none",
-                  },
-                  body: {
-                    ref: "label",
-                    fill: "#fff",
-                    stroke: "#5F95FF",
-                    strokeWidth: 1,
-                    rx: 4,
-                    ry: 4,
-                    refWidth: "140%",
-                    refHeight: "140%",
-                    refX: "-20%",
-                    refY: "-20%",
-                  },
-                },
-                position: {
-                  distance: 0.5,
-                  options: {
-                    absoluteDistance: true,
-                    reverseDistance: true,
-                  },
-                },
-              },
-            });
-          },
-          // 验证连接
-          validateConnection({
-            sourceView,
-            targetView,
-            sourceMagnet,
-            targetMagnet,
-          }) {
-            // 不允许连接到自己
-            if (sourceView === targetView) {
-              return false;
-            }
-            // 必须连接到端口
-            if (!sourceMagnet || !targetMagnet) {
-              return false;
-            }
-            // 不允许重复连接
-            const sourcePortId = sourceMagnet.getAttribute("port");
-            const targetPortId = targetMagnet.getAttribute("port");
-            const sourceNode = sourceView.cell;
-            const targetNode = targetView.cell;
-
-            // 检查是否已存在相同的连接
-            const edges = graphRef.current?.getEdges() || [];
-            const duplicateEdge = edges.find(
-              (edge) =>
-                edge.getSourceCellId() === sourceNode.id &&
-                edge.getTargetCellId() === targetNode.id &&
-                edge.getSourcePortId() === sourcePortId &&
-                edge.getTargetPortId() === targetPortId
-            );
-
-            return !duplicateEdge;
-          },
-        },
-        // 高亮效果配置
-        highlighting: {
-          magnetAdsorbed: {
-            name: "stroke",
-            args: {
-              attrs: {
-                fill: "#5F95FF",
-                stroke: "#5F95FF",
-                strokeWidth: 3,
-              },
-            },
-          },
-          magnetAvailable: {
-            name: "stroke",
-            args: {
-              attrs: {
-                fill: "#fff",
-                stroke: "#5F95FF",
-                strokeWidth: 2,
-              },
-            },
-          },
-        },
-      });
-
+      const graph = new Graph(createGraphConfig(containerRef.current));
       graphRef.current = graph;
       graph.use(new Snapline({ enabled: true }));
 
@@ -966,15 +471,13 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
       stencilRef.current.appendChild(stencil.container);
       graph.stencil = stencil;
 
-      // 延迟加载组件，确保 stencil 完全初始化
       setTimeout(() => {
         try {
-          const elementComponents = createElementComponents(elements);
-          const skillComponents = createSkillComponents(skills);
-          const colorComponents = createColorComponents(rgbs);
-          const timeWaitComponents = createTimeWaitComponents();
+          const elementComponents = createElementComponents(elements, portsConfig);
+          const skillComponents = createSkillComponents(skills, portsConfig);
+          const colorComponents = createColorComponents(rgbs, portsConfig);
+          const timeWaitComponents = createTimeWaitComponents(portsConfig);
 
-          // 安全加载各个组件
           if (elementComponents.length > 0) {
             stencil.load(elementComponents, "elements");
           }
@@ -990,9 +493,8 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
         } catch (error) {
           console.error("加载 stencil 组件时出错:", error);
         }
-      }, 1000); // 增加延迟时间
+      }, 1000);
 
-      // 事件监听
       graph.on("node:contextmenu", handleNodeContextMenu);
       graph.on("edge:contextmenu", handleEdgeContextMenu);
 
@@ -1011,14 +513,13 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
         graph.dispose();
       };
     }, [
-      createElementComponents,
-      createSkillComponents,
-      createColorComponents,
-      createTimeWaitComponents,
+      elements,
+      skills,
+      rgbs,
+      portsConfig,
       handleNodeContextMenu,
       handleEdgeContextMenu,
       triggerChange,
-      // 移除 elements, skills, rgbs 依赖，避免重复初始化
     ]);
 
     // 更新图形数据
@@ -1029,15 +530,17 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
         let ports = portsConfig.delay;
 
         if (node.data?.elements_code === 4 || node.data?.elements_code === 5) {
-          ports = portsConfig.singleY; // 单个端口
+          ports = portsConfig.singleY;
         } else if (
           node.data?.skill_name ||
           node.label === "取色" ||
-          node.data?.rgb || // 添加这个条件，检查是否有RGB数据
-          node.data?.coordinate || // 添加这个条件，检查是否有坐标数据
-          ["等待", "内力"].some((type) => node.label?.startsWith(type))
+          node.data?.rgb ||
+          node.data?.coordinate ||
+          node.data?.t === 2 ||
+          ["内力"].some((type) => node.label?.startsWith(type)) ||
+          (node.label && node.label.includes("定时:") && !node.label.includes("重置"))
         ) {
-          ports = portsConfig.normal; // 三个端口
+          ports = portsConfig.normal;
         }
 
         return { ...node, ports };
@@ -1055,30 +558,25 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
       });
     }, [nodes, edges, portsConfig]);
 
-    // 监听 elements 变化刷新组件
+    // 监听数据变化刷新组件
     useEffect(() => {
       const timer = setTimeout(() => {
         refreshElementComponents();
       }, 400);
-
       return () => clearTimeout(timer);
     }, [elements]);
 
-    // 监听 skills 变化刷新组件
     useEffect(() => {
       const timer = setTimeout(() => {
         refreshSkillComponents();
       }, 100);
-
       return () => clearTimeout(timer);
     }, [skills]);
 
-    // 监听 rgbs 变化刷新组件 - 保持现有代码不变
     useEffect(() => {
       const timer = setTimeout(() => {
         refreshColorComponents();
       }, 100);
-
       return () => clearTimeout(timer);
     }, [rgbs]);
 
@@ -1091,13 +589,14 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
           <div ref={containerRef} className="app-content" />
         </div>
 
+        {/* 时间设置Modal */}
         <Modal
           title={
             modalLabel === "内力"
               ? "设置内力小于等于"
               : modalLabel === "弹起延迟"
-              ? "设置按键弹起延迟"
-              : `设置${modalLabel}时间`
+                ? "设置按键弹起延迟"
+                : `设置${modalLabel}时间`
           }
           open={modalVisible}
           onOk={handleTimeEdit}
@@ -1117,8 +616,8 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
               modalLabel === "内力"
                 ? "请输入内力点数"
                 : modalLabel === "弹起延迟"
-                ? "请输入延迟毫秒数"
-                : "请输入毫秒"
+                  ? "请输入延迟毫秒数"
+                  : "请输入毫秒"
             }
             min={0}
             max={modalLabel === "弹起延迟" ? 10000 : undefined}
@@ -1126,6 +625,76 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
           />
         </Modal>
 
+        {/* 定时器设置Modal */}
+        <Modal
+          title="设置定时器"
+          open={timerModalVisible}
+          onOk={handleTimerSetting}
+          onCancel={() => {
+            setTimerModalVisible(false);
+            setTimerName("");
+            setTimerTime(0);
+            setEditingNode(null);
+          }}
+          okText="确定"
+          cancelText="取消"
+        >
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: "block", marginBottom: 8 }}>定时名称:</label>
+            <Input
+              value={timerName}
+              onChange={(e) => setTimerName(e.target.value)}
+              placeholder="请输入定时器名称"
+              style={{ width: "100%" }}
+            />
+          </div>
+          <div>
+            <label style={{ display: "block", marginBottom: 8 }}>定时时间(ms):</label>
+            <InputNumber
+              value={timerTime}
+              onChange={setTimerTime}
+              placeholder="请输入定时毫秒数"
+              min={0}
+              max={999999}
+              style={{ width: "100%" }}
+            />
+          </div>
+        </Modal>
+
+        {/* 重置定时器设置Modal */}
+        <Modal
+          title="设置重置定时器"
+          open={resetTimerModalVisible}
+          onOk={handleResetTimerSetting}
+          onCancel={() => {
+            setResetTimerModalVisible(false);
+            setSelectedTimerName("");
+            setEditingNode(null);
+          }}
+          okText="确定"
+          cancelText="取消"
+        >
+          <div>
+            <label style={{ display: "block", marginBottom: 8 }}>选择要重置的定时器:</label>
+            <Select
+              value={selectedTimerName}
+              onChange={setSelectedTimerName}
+              placeholder="请选择定时器"
+              style={{ width: "100%" }}
+              options={timers.map(timer => ({
+                value: timer.name,
+                label: timer.name || timer.id,
+              }))}
+            />
+          </div>
+          {timers.length === 0 && (
+            <div style={{ color: "#999", marginTop: 8, fontSize: 12 }}>
+              当前没有可用的定时器，请先创建定时器组件并设置
+            </div>
+          )}
+        </Modal>
+
+        {/* 保存取色数据Modal */}
         <Modal
           title="保存取色数据"
           open={saveColorModalVisible}

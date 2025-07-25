@@ -82,8 +82,6 @@ pub fn run_element(
                 }
                 2 => {
                     let e_id = &t.id;
-                    let out_wait_time = t.n * 2;
-                    let now = Instant::now();
 
                     let check_result = match TIME_CHECK_TIME.try_lock() {
                         Ok(mut last_time_map) => {
@@ -91,15 +89,11 @@ pub fn run_element(
                                 let duration = last_time.elapsed().as_millis();
                                 if duration <= t.n.into() {
                                     false
-                                } else if duration > out_wait_time.into() {
-                                    last_time_map.remove(e_id);
-                                    true
                                 } else {
-                                    last_time_map.insert(e_id.clone(), now);
                                     true
                                 }
                             } else {
-                                last_time_map.insert(e_id.clone(), now);
+                                last_time_map.insert(e_id.clone(), Instant::now());
                                 false
                             }
                         }
@@ -110,7 +104,6 @@ pub fn run_element(
                             false
                         }
                     };
-
                     let target_iyn = if check_result { "y" } else { "n" };
                     collect_children(c.children.clone(), target_iyn)
                 }
@@ -134,6 +127,24 @@ pub fn run_element(
                             collect_children(c.children.clone(), "n")
                         }
                     }
+                }
+                4 => {
+                    let now = Instant::now();
+                    match TIME_CHECK_TIME.try_lock() {
+                        Ok(mut last_time_map) => {
+                            if let Some(last_time) = last_time_map.get_mut(&t.id) {
+                                *last_time = now;
+                            } else {
+                                last_time_map.insert(t.id.clone(), now);
+                            }
+                        }
+                        Err(_) => {
+                            eprintln!(
+                                "Failed to acquire TIME_CHECK_TIME lock, using default value"
+                            );
+                        }
+                    };
+                    collect_children(c.children.clone(), "y")
                 }
                 _ => Vec::new(),
             },

@@ -43,6 +43,7 @@ interface Skill {
 
 interface TimeOrNama {
     id: string;
+    name: string; // 可选属性，默认为空字符串
     t: number;
     n: number;
 }
@@ -169,32 +170,41 @@ const OperateCard = forwardRef(({ operate, onEdit }: Props, ref) => {
                 return {
                     skill_code: data.skill_code
                 } as Skill;
-            } else if (data.timeOrNama || label.includes("延迟") || label.includes("等待") || label.includes("内力")) {
+            } else if (data.timeOrNama || data.t) {
                 let t = 1;
                 let n = 0;
+                let id = data.id || "";
 
                 if (data.timeOrNama) {
                     t = data.timeOrNama.t;
                     n = data.timeOrNama.n;
                 } else {
-                    // 解析逻辑保持不变
-                    if (label.includes("延迟")) {
-                        t = 1;
-                        const match = label.match(/(\d+)/);
-                        n = match ? parseInt(match[1]) : 0;
-                    } else if (label.includes("等待")) {
-                        t = 2;
-                        const match = label.match(/(\d+)/);
-                        n = match ? parseInt(match[1]) : 0;
-                    } else if (label.includes("内力")) {
-                        t = 3;
-                        const match = label.match(/(\d+)/);
-                        n = match ? parseInt(match[1]) : 0;
-                    }
+                    console.log(data)
+                    t = data.t || 1; // 默认值为1
+                    n = data.n || 0; // 默认值为0
+                    // // 解析逻辑保持不变
+                    // if (label.includes("延迟")) {
+                    //     t = 1;
+                    //     const match = label.match(/(\d+)/);
+                    //     n = match ? parseInt(match[1]) : 0;
+                    // } else if (label.includes("重置定时")) {
+                    //     t = 4;
+                    //     const match = label.match(/(\d+)/);
+                    //     n = match ? parseInt(match[1]) : 0;
+                    // } else if (label.includes("内力")) {
+                    //     t = 3;
+                    //     const match = label.match(/(\d+)/);
+                    //     n = match ? parseInt(match[1]) : 0;
+                    // } else if (label.includes("定时")) {
+                    //     t = 2;
+                    //     const match = label.match(/(\d+)/);
+                    //     n = match ? parseInt(match[1]) : 0;
+                    // }
                 }
 
                 return {
-                    id: node.id || "",
+                    id: id,
+                    name: node.name || "", // 使用节点的label作为名称
                     t,
                     n
                 } as TimeOrNama;

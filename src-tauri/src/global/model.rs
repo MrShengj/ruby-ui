@@ -14,9 +14,10 @@ pub struct Skill {
 
 #[derive(Debug, Deserialize, Clone, Serialize, Default)]
 pub struct TimeOrNama {
-    pub id: String, // 元素id
-    pub t: u32,     // 1: 延迟 2: 等待技能释放 3: 内力判断
-    pub n: u32,     // 延迟时间或技能编号
+    pub id: String,           // 元素id
+    pub name: Option<String>, // 元素名称
+    pub t: u32,               // 1: 延迟 2: 等待技能释放 3: 内力判断
+    pub n: u32,               // 延迟时间或技能编号
 }
 
 #[derive(Debug, Deserialize, Clone, Serialize, Default)]
