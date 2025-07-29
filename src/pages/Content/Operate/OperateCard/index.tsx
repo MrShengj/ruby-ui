@@ -39,6 +39,8 @@ interface Element {
 
 interface Skill {
     skill_code: number;
+    skill_type?: number; // 可选属性，默认为0
+    skill_offset?: string; // 可选属性，默认为0
 }
 
 interface TimeOrNama {
@@ -46,6 +48,7 @@ interface TimeOrNama {
     name: string; // 可选属性，默认为空字符串
     t: number;
     n: number;
+    init: boolean; // 可选属性，默认为false
 }
 
 interface Color {
@@ -168,18 +171,21 @@ const OperateCard = forwardRef(({ operate, onEdit }: Props, ref) => {
                 } as Element;
             } else if (data.skill_code !== undefined) {
                 return {
-                    skill_code: data.skill_code
+                    skill_code: data.skill_code,
+                    skill_type: data.skill_type || 0, // 默认技能类型为0
+                    skill_offset: data.skill_offset || 0 // 默认技能偏移为0
                 } as Skill;
             } else if (data.timeOrNama || data.t) {
                 let t = 1;
                 let n = 0;
                 let id = data.id || "";
+                let init = data.init || false;
 
                 if (data.timeOrNama) {
                     t = data.timeOrNama.t;
                     n = data.timeOrNama.n;
                 } else {
-                    console.log(data)
+                    // console.log(data)
                     t = data.t || 1; // 默认值为1
                     n = data.n || 0; // 默认值为0
                     // // 解析逻辑保持不变
@@ -206,7 +212,8 @@ const OperateCard = forwardRef(({ operate, onEdit }: Props, ref) => {
                     id: id,
                     name: node.name || "", // 使用节点的label作为名称
                     t,
-                    n
+                    n,
+                    init
                 } as TimeOrNama;
             } else if (label === "取色" || data.coordinate) {
                 return {

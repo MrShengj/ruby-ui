@@ -46,6 +46,8 @@ export const createSkillComponents = (skills: any[], portsConfig: any) => {
         data: {
           skill_name: skill.skill_name,
           skill_code: skill.skill_code,
+          skill_type: skill.skill_type,
+          skill_offset: skill.skill_offset,
         },
       })
   );

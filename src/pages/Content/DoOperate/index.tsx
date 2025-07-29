@@ -59,8 +59,23 @@ const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initi
     }
     const getAllSkills = async () => {
         await getSkills().then((res) => {
+            // console.log("获取技能列表:", res);
             if (res.code === 200) {
-                setSkills(res.data);
+                let skills_get = [];
+                res.data.forEach(element => {
+                    // 处理每个技能元素
+                    let skill_str = element.skill_code;
+                    // skill_code 是数字数组
+                    if (typeof skill_str === 'string') {
+                        skill_str = skill_str.split(",").map((code: string) => code.trim());
+                        // ['22106'] 转换成 [22106]
+                        skill_str = skill_str.map((code: string) => parseInt(code, 10));
+                    }
+                    let skill = { skill_name: element.skill_name, skill_code: skill_str, skill_type: element.skill_type || 0, skill_offset: element.skill_offset || 0 };
+                    skills_get.push(skill);
+                });
+                setSkills(skills_get);
+                console.log("技能列表:", skills_get);
             }
         }).catch((error) => {
             console.error("获取技能列表失败:", error);
@@ -285,7 +300,7 @@ const DoOperate = forwardRef(({ open, onClose, nodes: initialNodes, edges: initi
         setIsDeleteModalOpen(false);
 
         // 调用父组件的关闭回调
-        console.log("抽屉关闭. 执行回调");
+        // console.log("抽屉关闭. 执行回调");
         if (onClose) onClose();
     };
 

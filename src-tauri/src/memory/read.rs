@@ -104,6 +104,7 @@ impl GameMemoryReader {
     }
 
     /// 读取技能名称
+    #[allow(dead_code)]
     pub fn read_skill(&self) -> Result<u32, MemoryError> {
         let skill_address = self.base_address + 0x00C912F0;
         let offsets = 0x60;
@@ -133,6 +134,50 @@ impl GameMemoryReader {
         }
 
         // 最终读取法力值
+        Ok(current_address)
+    }
+
+    // 左右键和F
+    #[allow(dead_code)]
+    pub fn read_lrf(&self, offset: usize) -> Result<usize, MemoryError> {
+        // println!("读取技能偏移量: {}", offset);
+        // offset10进制转16进制
+        // println!("技能偏移量(16进制): {:#X}", offset);
+        // let offsets = [0x00C912F0, 0x248, 0x8, 0x4, 0x8, 0x0, 0x30, offset];
+        let offsets = [0x00C912F0, 0x25C, offset];
+        let mut current_address = self.base_address;
+
+        for &offset in &offsets {
+            // 检查当前地址是否有效
+            if current_address == 0 {
+                return Err(MemoryError::ReadMemoryFailed(Error::from_win32()));
+            }
+
+            // 读取当前地址的值
+            current_address = self.read_memory::<usize>(current_address + offset, Some(4))?;
+        }
+
+        Ok(current_address)
+    }
+
+    #[allow(dead_code)]
+    pub fn read_skill_plan(&self, offset: usize) -> Result<usize, MemoryError> {
+        let offsets = [
+            0x00C910E4, 0x2C, 0x0C, 0x00058B48, 0x00017A80, 0x28, offset, 0x10,
+        ];
+        let mut current_address = self.base_address;
+
+        for &offset in &offsets {
+            // 检查当前地址是否有效
+            if current_address == 0 {
+                return Err(MemoryError::ReadMemoryFailed(Error::from_win32()));
+            }
+
+            // 读取当前地址的值
+            current_address = self.read_memory::<usize>(current_address + offset, Some(4))?;
+        }
+
+        // 最终读取技能计划
         Ok(current_address)
     }
 }

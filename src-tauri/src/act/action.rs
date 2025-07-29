@@ -53,6 +53,7 @@ pub fn run_element(
 
         let children_to_add = match &c.element {
             ElementEnum::Element(e) => {
+                // println!("执行元素: {:?}", e);
                 simulate_key(e.elements_code, e.key_up_delay)
                     .map_err(|e| format!("Failed to simulate key: {:?}", e))?;
                 collect_children(c.children.clone(), "y")
@@ -61,13 +62,45 @@ pub fn run_element(
                 let process_name = PROCESS_NAME.clone();
                 match GameMemoryReader::new(&process_name, 0x00400000) {
                     Ok(reader) => {
-                        let skill_code = reader.read_skill().unwrap_or_else(|e| {
-                            eprintln!("Error reading skill: {:?}", e);
-                            0
-                        });
-                        let target_iyn: &'static str =
-                            if skill_code == s.skill_code { "y" } else { "n" };
-                        collect_children(c.children.clone(), target_iyn)
+                        // s.skill_offset是Option<String>类型，需要处理成usize
+                        let skill_offset = s
+                            .skill_offset
+                            .as_ref()
+                            .and_then(|s| s.parse::<usize>().ok());
+                        match skill_offset {
+                            Some(offset) => {
+                                // println!("技能偏移量: {}", offset);
+                                let skill_code = if s.skill_type == 2 {
+                                    reader.read_lrf(offset).unwrap_or_else(|e| {
+                                        eprintln!("Error reading skill: {:?}", e);
+                                        0
+                                    })
+                                } else {
+                                    reader.read_skill_plan(offset).unwrap_or_else(|e| {
+                                        eprintln!("Error reading skill: {:?}", e);
+                                        0
+                                    })
+                                };
+                                // println!("技能代码: {}", skill_code);
+
+                                if s.skill_code.contains(&(skill_code as u32)) {
+                                    // 如果技能代码匹配，则返回子元素的iyn为"y"
+                                    let target_iyn = "y";
+                                    collect_children(c.children.clone(), target_iyn)
+                                } else {
+                                    // 如果技能代码不匹配，则返回子元素的iyn为"n"
+                                    let target_iyn = "n";
+                                    collect_children(c.children.clone(), target_iyn)
+                                }
+                                // let target_iyn: &'static str =
+                                //     if skill_code == s.skill_code { "y" } else { "n" };
+                                // collect_children(c.children.clone(), target_iyn)
+                            }
+                            None => {
+                                eprintln!("技能偏移量解析失败，使用默认值0");
+                                collect_children(c.children.clone(), "n")
+                            }
+                        }
                     }
                     Err(e) => {
                         eprintln!("Failed to create GameMemoryReader: {:?}", e);
@@ -87,13 +120,17 @@ pub fn run_element(
                         Ok(mut last_time_map) => {
                             if let Some(last_time) = last_time_map.get(e_id) {
                                 let duration = last_time.elapsed().as_millis();
+                                // println!("元素 {} 上次执行时间: {:?} 毫秒", e_id, duration);
                                 if duration <= t.n.into() {
-                                    false
-                                } else {
                                     true
+                                } else {
+                                    false
                                 }
                             } else {
-                                last_time_map.insert(e_id.clone(), Instant::now());
+                                if t.init {
+                                    last_time_map.insert(e_id.clone(), Instant::now());
+                                    println!("进行初始化")
+                                }
                                 false
                             }
                         }

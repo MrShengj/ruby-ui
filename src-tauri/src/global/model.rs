@@ -9,7 +9,9 @@ pub struct Element {
 
 #[derive(Debug, Deserialize, Clone, Serialize, Default)]
 pub struct Skill {
-    pub skill_code: u32,
+    pub skill_code: Vec<u32>,         // 技能代码
+    pub skill_type: u32,              // 技能类型
+    pub skill_offset: Option<String>, // 技能偏移量
 }
 
 #[derive(Debug, Deserialize, Clone, Serialize, Default)]
@@ -18,6 +20,7 @@ pub struct TimeOrNama {
     pub name: Option<String>, // 元素名称
     pub t: u32,               // 1: 延迟 2: 等待技能释放 3: 内力判断
     pub n: u32,               // 延迟时间或技能编号
+    pub init: bool,           // 是否初始化
 }
 
 #[derive(Debug, Deserialize, Clone, Serialize, Default)]

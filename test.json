@@ -1,0 +1,366 @@
+{
+    "header": {
+        "elements_key": "侧上键",
+        "elements_code": 5,
+        "key_up_delay": 0
+    },
+    "children": [
+        {
+            "element": {
+                "elements_key": "R",
+                "elements_code": 82,
+                "key_up_delay": 0
+            },
+            "iyn": "y",
+            "children": [
+                {
+                    "element": {
+                        "id": "",
+                        "name": "",
+                        "t": 1,
+                        "n": 200,
+                        "init": false
+                    },
+                    "iyn": "y",
+                    "children": [
+                        {
+                            "element": {
+                                "elements_key": "X",
+                                "elements_code": 88,
+                                "key_up_delay": 0
+                            },
+                            "iyn": "y",
+                            "children": [
+                                {
+                                    "element": {
+                                        "id": "",
+                                        "name": "",
+                                        "t": 1,
+                                        "n": 100,
+                                        "init": false
+                                    },
+                                    "iyn": "y",
+                                    "children": [
+                                        {
+                                            "element": {
+                                                "id": "MzIzcPrm",
+                                                "name": "",
+                                                "t": 2,
+                                                "n": 4000,
+                                                "init": false
+                                            },
+                                            "iyn": "y",
+                                            "children": [
+                                                {
+                                                    "element": {
+                                                        "id": "",
+                                                        "name": "",
+                                                        "t": 3,
+                                                        "n": 2,
+                                                        "init": false
+                                                    },
+                                                    "iyn": "n",
+                                                    "children": [
+                                                        {
+                                                            "element": {
+                                                                "elements_key": "T",
+                                                                "elements_code": 84,
+                                                                "key_up_delay": 0
+                                                            },
+                                                            "iyn": "n",
+                                                            "children": [
+                                                                {
+                                                                    "element": {
+                                                                        "id": "",
+                                                                        "name": "",
+                                                                        "t": 1,
+                                                                        "n": 200,
+                                                                        "init": false
+                                                                    },
+                                                                    "iyn": "y",
+                                                                    "children": [
+                                                                        {
+                                                                            "element": {
+                                                                                "id": "",
+                                                                                "name": "",
+                                                                                "t": 3,
+                                                                                "n": 3,
+                                                                                "init": false
+                                                                            },
+                                                                            "iyn": "y",
+                                                                            "children": [
+                                                                                {
+                                                                                    "element": {
+                                                                                        "elements_key": "2",
+                                                                                        "elements_code": 50,
+                                                                                        "key_up_delay": 0
+                                                                                    },
+                                                                                    "iyn": "n",
+                                                                                    "children": [
+                                                                                        {
+                                                                                            "element": {
+                                                                                                "id": "",
+                                                                                                "name": "",
+                                                                                                "t": 1,
+                                                                                                "n": 200,
+                                                                                                "init": false
+                                                                                            },
+                                                                                            "iyn": "y",
+                                                                                            "children": null
+                                                                                        }
+                                                                                    ]
+                                                                                },
+                                                                                {
+                                                                                    "element": {
+                                                                                        "skill_code": [
+                                                                                            22392
+                                                                                        ],
+                                                                                        "skill_type": 2,
+                                                                                        "skill_offset": "84216"
+                                                                                    },
+                                                                                    "iyn": "y",
+                                                                                    "children": [
+                                                                                        {
+                                                                                            "element": {
+                                                                                                "elements_key": "F",
+                                                                                                "elements_code": 70,
+                                                                                                "key_up_delay": 0
+                                                                                            },
+                                                                                            "iyn": "y",
+                                                                                            "children": [
+                                                                                                {
+                                                                                                    "element": {
+                                                                                                        "id": "",
+                                                                                                        "name": "",
+                                                                                                        "t": 1,
+                                                                                                        "n": 100,
+                                                                                                        "init": false
+                                                                                                    },
+                                                                                                    "iyn": "y",
+                                                                                                    "children": null
+                                                                                                }
+                                                                                            ]
+                                                                                        },
+                                                                                        {
+                                                                                            "element": {
+                                                                                                "skill_code": [
+                                                                                                    22266
+                                                                                                ],
+                                                                                                "skill_type": 1,
+                                                                                                "skill_offset": "16"
+                                                                                            },
+                                                                                            "iyn": "n",
+                                                                                            "children": [
+                                                                                                {
+                                                                                                    "element": {
+                                                                                                        "elements_key": "Z",
+                                                                                                        "elements_code": 90,
+                                                                                                        "key_up_delay": 0
+                                                                                                    },
+                                                                                                    "iyn": "y",
+                                                                                                    "children": [
+                                                                                                        {
+                                                                                                            "element": {
+                                                                                                                "id": "",
+                                                                                                                "name": "",
+                                                                                                                "t": 1,
+                                                                                                                "n": 100,
+                                                                                                                "init": false
+                                                                                                            },
+                                                                                                            "iyn": "y",
+                                                                                                            "children": [
+                                                                                                                {
+                                                                                                                    "element": {
+                                                                                                                        "skill_code": [
+                                                                                                                            22110
+                                                                                                                        ],
+                                                                                                                        "skill_type": 1,
+                                                                                                                        "skill_offset": "20"
+                                                                                                                    },
+                                                                                                                    "iyn": "y",
+                                                                                                                    "children": [
+                                                                                                                        {
+                                                                                                                            "element": {
+                                                                                                                                "elements_key": "X",
+                                                                                                                                "elements_code": 88,
+                                                                                                                                "key_up_delay": 0
+                                                                                                                            },
+                                                                                                                            "iyn": "y",
+                                                                                                                            "children": [
+                                                                                                                                {
+                                                                                                                                    "element": {
+                                                                                                                                        "id": "",
+                                                                                                                                        "name": "",
+                                                                                                                                        "t": 1,
+                                                                                                                                        "n": 100,
+                                                                                                                                        "init": false
+                                                                                                                                    },
+                                                                                                                                    "iyn": "y",
+                                                                                                                                    "children": [
+                                                                                                                                        {
+                                                                                                                                            "element": {
+                                                                                                                                                "id": "",
+                                                                                                                                                "name": "",
+                                                                                                                                                "t": 3,
+                                                                                                                                                "n": 2,
+                                                                                                                                                "init": false
+                                                                                                                                            },
+                                                                                                                                            "iyn": "y",
+                                                                                                                                            "children": [
+                                                                                                                                                {
+                                                                                                                                                    "element": {
+                                                                                                                                                        "skill_code": [
+                                                                                                                                                            22265
+                                                                                                                                                        ],
+                                                                                                                                                        "skill_type": 2,
+                                                                                                                                                        "skill_offset": "84216"
+                                                                                                                                                    },
+                                                                                                                                                    "iyn": "y",
+                                                                                                                                                    "children": [
+                                                                                                                                                        {
+                                                                                                                                                            "element": {
+                                                                                                                                                                "elements_key": "F",
+                                                                                                                                                                "elements_code": 70,
+                                                                                                                                                                "key_up_delay": 0
+                                                                                                                                                            },
+                                                                                                                                                            "iyn": "y",
+                                                                                                                                                            "children": [
+                                                                                                                                                                {
+                                                                                                                                                                    "element": {
+                                                                                                                                                                        "id": "",
+                                                                                                                                                                        "name": "",
+                                                                                                                                                                        "t": 1,
+                                                                                                                                                                        "n": 900,
+                                                                                                                                                                        "init": false
+                                                                                                                                                                    },
+                                                                                                                                                                    "iyn": "y",
+                                                                                                                                                                    "children": null
+                                                                                                                                                                }
+                                                                                                                                                            ]
+                                                                                                                                                        }
+                                                                                                                                                    ]
+                                                                                                                                                }
+                                                                                                                                            ]
+                                                                                                                                        }
+                                                                                                                                    ]
+                                                                                                                                }
+                                                                                                                            ]
+                                                                                                                        }
+                                                                                                                    ]
+                                                                                                                }
+                                                                                                            ]
+                                                                                                        }
+                                                                                                    ]
+                                                                                                }
+                                                                                            ]
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "element": {
+                                                                "skill_code": [
+                                                                    22263
+                                                                ],
+                                                                "skill_type": 1,
+                                                                "skill_offset": "24"
+                                                            },
+                                                            "iyn": "y",
+                                                            "children": [
+                                                                {
+                                                                    "element": {
+                                                                        "elements_key": "C",
+                                                                        "elements_code": 67,
+                                                                        "key_up_delay": 0
+                                                                    },
+                                                                    "iyn": "y",
+                                                                    "children": [
+                                                                        {
+                                                                            "element": {
+                                                                                "id": "",
+                                                                                "name": "",
+                                                                                "t": 1,
+                                                                                "n": 100,
+                                                                                "init": false
+                                                                            },
+                                                                            "iyn": "y",
+                                                                            "children": null
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "element": {
+                                                        "elements_key": "R",
+                                                        "elements_code": 82,
+                                                        "key_up_delay": 0
+                                                    },
+                                                    "iyn": "y",
+                                                    "children": [
+                                                        {
+                                                            "element": {
+                                                                "id": "",
+                                                                "name": "",
+                                                                "t": 1,
+                                                                "n": 100,
+                                                                "init": false
+                                                            },
+                                                            "iyn": "y",
+                                                            "children": [
+                                                                {
+                                                                    "element": {
+                                                                        "elements_key": "1",
+                                                                        "elements_code": 49,
+                                                                        "key_up_delay": 0
+                                                                    },
+                                                                    "iyn": "y",
+                                                                    "children": [
+                                                                        {
+                                                                            "element": {
+                                                                                "id": "",
+                                                                                "name": "",
+                                                                                "t": 1,
+                                                                                "n": 100,
+                                                                                "init": false
+                                                                            },
+                                                                            "iyn": "y",
+                                                                            "children": [
+                                                                                {
+                                                                                    "element": {
+                                                                                        "id": "MzIzcPrm",
+                                                                                        "name": "",
+                                                                                        "t": 4,
+                                                                                        "n": 0,
+                                                                                        "init": false
+                                                                                    },
+                                                                                    "iyn": "y",
+                                                                                    "children": null
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

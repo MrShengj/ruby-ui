@@ -145,14 +145,15 @@ export const createContextMenuItems = (
   if (
     nodeData?.type === "timer" ||
     label === "定时" ||
-    (label && label.includes("定时:") && !label.includes("重置"))
+    (label && label.includes("定时:") && !label.includes("重置")) ||
+    nodeData?.t == 2
   ) {
     const setBtn = document.createElement("div");
     setBtn.className = "x6-context-menu-item";
     setBtn.innerText = "设置";
     setBtn.onclick = () => {
       if (nodeData?.id && nodeData?.n) {
-        setTimerName(nodeData.id);
+        setTimerName(nodeData.name || nodeData.id);
         setTimerTime(nodeData.n);
       } else {
         setTimerName("");
@@ -169,7 +170,8 @@ export const createContextMenuItems = (
   if (
     nodeData?.type === "resetTimer" ||
     label === "重置定时" ||
-    (label && label.includes("重置定时:"))
+    (label && label.includes("重置定时:")) ||
+    (nodeData?.t == 3 && !label.includes("内力"))
   ) {
     const setBtn = document.createElement("div");
     setBtn.className = "x6-context-menu-item";

@@ -10,7 +10,7 @@ import React, {
 import { Graph } from "@antv/x6";
 import { Snapline } from "@antv/x6-plugin-snapline";
 import { Stencil } from "@antv/x6-plugin-stencil";
-import { message, Modal, Input, InputNumber, Select } from "antd";
+import { message, Modal, Input, InputNumber, Select, Checkbox } from "antd";
 import { createUserRGB, deleteUserRGB } from "../../api/element";
 import { generateRandomId, TimeOrNamaLabel } from "../../utils/common";
 import "./OperateX6.css";
@@ -54,6 +54,7 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
     const [resetTimerModalVisible, setResetTimerModalVisible] = useState(false);
     const [selectedTimerName, setSelectedTimerName] = useState("");
     const [timers, setTimers] = useState<TimerData[]>([]);
+    const [timerInit, setTimerInit] = useState(false);
 
     // 端口配置
     const portsConfig = useMemo(() => createPortsConfig(), []);
@@ -344,6 +345,7 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
           n: timerTime,
           name: timerName.trim(),
           id: generateRandomId(),
+          init: timerInit, // 新增
         });
 
         messageApi.success(`定时器 "${timerName.trim()}" 设置成功，时间: ${timerTime}ms`);
@@ -354,8 +356,9 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
       setTimerModalVisible(false);
       setTimerName("");
       setTimerTime(0);
+      setTimerInit(false); // 重置
       setEditingNode(null);
-    }, [editingNode, timerName, timerTime, triggerChange, messageApi]);
+    }, [editingNode, timerName, timerTime, timerInit, triggerChange, messageApi]);
 
     const handleResetTimerSetting = useCallback(() => {
       if (editingNode && selectedTimerName) {
@@ -634,6 +637,7 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
             setTimerModalVisible(false);
             setTimerName("");
             setTimerTime(0);
+            setTimerInit(false);
             setEditingNode(null);
           }}
           okText="确定"
@@ -648,7 +652,7 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
               style={{ width: "100%" }}
             />
           </div>
-          <div>
+          <div style={{ marginBottom: 16 }}>
             <label style={{ display: "block", marginBottom: 8 }}>定时时间(ms):</label>
             <InputNumber
               value={timerTime}
@@ -658,6 +662,11 @@ const OperateX6 = forwardRef<any, OperateX6Props>(
               max={999999}
               style={{ width: "100%" }}
             />
+          </div>
+          <div>
+            <Checkbox checked={timerInit} onChange={e => setTimerInit(e.target.checked)}>
+              是否初始化
+            </Checkbox>
           </div>
         </Modal>
 
