@@ -11,7 +11,7 @@ use windows::Win32::UI::Input::KeyboardAndMouse::{
 static SCAN_CODE_CACHE: Lazy<Mutex<std::collections::HashMap<u16, u16>>> =
     Lazy::new(|| Mutex::new(std::collections::HashMap::new()));
 
-pub fn simulate_key(key: u32, key_up_delay: u32) -> Result<(), String> {
+pub fn simulate_key_once(key: u32, key_up_delay: u32) -> Result<(), String> {
     let virtual_key = key as u16;
 
     // 按键按下
@@ -163,4 +163,39 @@ pub fn clear_scan_code_cache() {
     if let Ok(mut cache) = SCAN_CODE_CACHE.lock() {
         cache.clear();
     }
+}
+
+pub fn simulate_key(key: u32, key_up_delay: u32) -> Result<(), String> {
+    let virtual_key = key as u16;
+
+    // 按下
+    enter_simulate_key(virtual_key, false)?;
+
+    // 模拟真实键盘连点
+    let initial_delay = 100; // 首次重复延迟，单位ms，可根据需要调整
+    let repeat_interval = 40; // 连点间隔，单位ms，可根据需要调整
+
+    if key_up_delay >= initial_delay {
+        // 初始延迟
+        thread::sleep(time::Duration::from_millis(repeat_interval as u64));
+        let mut elapsed = repeat_interval;
+        while elapsed + repeat_interval <= key_up_delay {
+            // 连点：再次发送“按下”事件
+            enter_simulate_key(virtual_key, false)?;
+            thread::sleep(time::Duration::from_millis(repeat_interval as u64));
+            elapsed += repeat_interval;
+        }
+        // 补足剩余时间
+        let remain = key_up_delay - elapsed;
+        if remain > 0 {
+            thread::sleep(time::Duration::from_millis(remain as u64));
+        }
+    } else if key_up_delay > 0 {
+        thread::sleep(time::Duration::from_millis(key_up_delay as u64));
+    }
+
+    // 松开
+    enter_simulate_key(virtual_key, true)?;
+
+    Ok(())
 }
