@@ -39,22 +39,11 @@ pub fn run_element(
         if stop_flag.load(Ordering::Relaxed) {
             return Ok(());
         }
-        // let element_type = match &c.element {
-        //     ElementEnum::Element(_) => "Element",
-        //     ElementEnum::Skill(_) => "Skill",
-        //     ElementEnum::TimeOrNama(_) => "TimeOrNama",
-        //     ElementEnum::Color(_) => "Color",
-        // };
-        // println!(
-        //     "[执行元素] ElementEnum::{:?} - {:?}",
-        //     element_type, c.element
-        // );
-        // let start_time = Instant::now();
 
         let children_to_add = match &c.element {
             ElementEnum::Element(e) => {
                 // println!("执行元素: {:?}", e);
-                simulate_key(e.elements_code, e.key_up_delay)
+                simulate_key(e.elements_code, e.key_up_delay, &stop_flag)
                     .map_err(|e| format!("Failed to simulate key: {:?}", e))?;
                 collect_children(c.children.clone(), "y")
             }

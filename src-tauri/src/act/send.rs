@@ -11,6 +11,7 @@ use windows::Win32::UI::Input::KeyboardAndMouse::{
 static SCAN_CODE_CACHE: Lazy<Mutex<std::collections::HashMap<u16, u16>>> =
     Lazy::new(|| Mutex::new(std::collections::HashMap::new()));
 
+#[allow(dead_code)]
 pub fn simulate_key_once(key: u32, key_up_delay: u32) -> Result<(), String> {
     let virtual_key = key as u16;
 
@@ -165,37 +166,69 @@ pub fn clear_scan_code_cache() {
     }
 }
 
-pub fn simulate_key(key: u32, key_up_delay: u32) -> Result<(), String> {
+pub fn simulate_key(
+    key: u32,
+    key_up_delay: u32,
+    stop_flag: &std::sync::Arc<std::sync::atomic::AtomicBool>,
+) -> Result<(), String> {
     let virtual_key = key as u16;
 
     // 按下
     enter_simulate_key(virtual_key, false)?;
 
-    // 模拟真实键盘连点
-    let initial_delay = 100; // 首次重复延迟，单位ms，可根据需要调整
-    let repeat_interval = 40; // 连点间隔，单位ms，可根据需要调整
+    let initial_delay = 100;
+    let repeat_interval = 50;
 
-    if key_up_delay >= initial_delay {
-        // 初始延迟
-        thread::sleep(time::Duration::from_millis(repeat_interval as u64));
+    if key_up_delay == 0 {
+        enter_simulate_key(virtual_key, true)?;
+        return Ok(());
+    }
+
+    if key_up_delay < initial_delay {
+        let sleep_time = key_up_delay as u64;
+        for _ in 0..sleep_time {
+            if stop_flag.load(std::sync::atomic::Ordering::Relaxed) {
+                enter_simulate_key(virtual_key, true)?; // 保证松开
+                return Ok(());
+            }
+            std::thread::sleep(std::time::Duration::from_millis(1));
+        }
+    } else {
+        // 首次延迟
+        for _ in 0..repeat_interval {
+            if stop_flag.load(std::sync::atomic::Ordering::Relaxed) {
+                enter_simulate_key(virtual_key, true)?;
+                return Ok(());
+            }
+            std::thread::sleep(std::time::Duration::from_millis(1));
+        }
         let mut elapsed = repeat_interval;
         while elapsed + repeat_interval <= key_up_delay {
-            // 连点：再次发送“按下”事件
+            if stop_flag.load(std::sync::atomic::Ordering::Relaxed) {
+                enter_simulate_key(virtual_key, true)?;
+                return Ok(());
+            }
             enter_simulate_key(virtual_key, false)?;
-            thread::sleep(time::Duration::from_millis(repeat_interval as u64));
+            for _ in 0..repeat_interval {
+                if stop_flag.load(std::sync::atomic::Ordering::Relaxed) {
+                    enter_simulate_key(virtual_key, true)?;
+                    return Ok(());
+                }
+                std::thread::sleep(std::time::Duration::from_millis(1));
+            }
             elapsed += repeat_interval;
         }
-        // 补足剩余时间
         let remain = key_up_delay - elapsed;
-        if remain > 0 {
-            thread::sleep(time::Duration::from_millis(remain as u64));
+        for _ in 0..remain {
+            if stop_flag.load(std::sync::atomic::Ordering::Relaxed) {
+                enter_simulate_key(virtual_key, true)?;
+                return Ok(());
+            }
+            std::thread::sleep(std::time::Duration::from_millis(1));
         }
-    } else if key_up_delay > 0 {
-        thread::sleep(time::Duration::from_millis(key_up_delay as u64));
     }
 
     // 松开
     enter_simulate_key(virtual_key, true)?;
-
     Ok(())
 }
