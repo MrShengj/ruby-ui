@@ -1,6 +1,6 @@
 [package]
 name = "ruby-ui"
-version = "0.1.1"
+version = "0.2.1"
 description = "自动化辅助工具"
 authors = ["you"]
 edition = "2021"
