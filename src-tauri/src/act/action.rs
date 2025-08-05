@@ -43,7 +43,7 @@ pub fn run_element(
         let children_to_add = match &c.element {
             ElementEnum::Element(e) => {
                 // println!("执行元素: {:?}", e);
-                simulate_key(e.elements_code, e.key_up_delay, &stop_flag)
+                simulate_key(e.elements_code.clone(), e.key_up_delay)
                     .map_err(|e| format!("Failed to simulate key: {:?}", e))?;
                 collect_children(c.children.clone(), "y")
             }
